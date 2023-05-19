@@ -57,21 +57,11 @@ RUN apt-get -y update && apt-get install --no-install-recommends -y $PKG_AWS_TOO
 ARG PKG_PYTHON_LIBS="ijson docker"
 RUN pip3 install $PKG_PYTHON_LIBS
 
-# setup apt repositories for openjdk
-ARG BENV_JAVA_VERSION=11
-RUN echo 'deb http://deb.debian.org/debian/ stretch main non-free contrib' \
-  > /etc/apt/sources.list.d/debian-stretch.list
-RUN echo 'deb http://deb.debian.org/debian-security/ stretch/updates main non-free contrib' \
-  >> /etc/apt/sources.list.d/debian-stretch.list
-RUN echo 'deb http://deb.debian.org/debian/ stretch-updates main non-free contrib' \
-  >> /etc/apt/sources.list.d/debian-stretch.list
-RUN echo 'deb http://deb.debian.org/debian/ stretch-backports main non-free contrib' \
-  >> /etc/apt/sources.list.d/debian-stretch.list
-
 # set up apt repositories for google-cloud-sdk
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 
+ARG BENV_JAVA_VERSION=11
 ARG PKG_EXTRA_PACKAGES="openjdk-${BENV_JAVA_VERSION}-jdk-headless google-cloud-sdk google-cloud-sdk-skaffold"
 RUN apt-get -y update && apt-get install -y --no-install-recommends $PKG_EXTRA_PACKAGES
 
