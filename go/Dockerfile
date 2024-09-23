@@ -7,7 +7,9 @@ ARG base_IMAGE_TAG
 FROM $base_IMAGE_TAG
 
 # protoc-gen-go
-RUN /usr/local/go/bin/go install github.com/golang/protobuf/protoc-gen-go@v1.5.2
+RUN /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+RUN /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
+
 
 # protoc-gen-grpc-gateway and protoc-gen-swagger
 # use v1 branch of grpc-gateway

@@ -12,7 +12,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 ENV BENV_BASE_IMAGE_DISTRO=${BENV_BASE_IMAGE_DISTRO}
 ENV BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}
 
-ARG GO_VERSION="1.20"
+ARG GO_VERSION="1.21.0"
 
 # setup apt (add non-free, contrib and backports)
 RUN [ "$BENV_BASE_IMAGE_DISTRO" != 'debian' ] || [ "$BENV_BASE_IMAGE_VERSION" != 'sid' ] \
@@ -86,7 +86,7 @@ RUN apt-get -y install $PKG_BCC
 
 # Recent version of Go
 WORKDIR /usr/local
-RUN curl "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" | tar xvz --
+RUN curl -L "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -xz
 # recommended: add PATH=$PATH:/usr/local/go/bin to ~/.bashrc
 
 # upgrade packages to latest
