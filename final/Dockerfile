@@ -61,7 +61,7 @@ RUN pip3 install $PKG_PYTHON_LIBS
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 
-ARG BENV_JAVA_VERSION=11
+ARG BENV_JAVA_VERSION=17
 ARG PKG_EXTRA_PACKAGES="openjdk-${BENV_JAVA_VERSION}-jdk-headless google-cloud-sdk google-cloud-sdk-skaffold"
 RUN apt-get -y update && apt-get install -y --no-install-recommends $PKG_EXTRA_PACKAGES
 
@@ -70,7 +70,7 @@ RUN update-alternatives --set java /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjd
 RUN update-alternatives --set javac /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-amd64/bin/javac
 
 # gradle
-RUN wget https://services.gradle.org/distributions/gradle-6.0.1-bin.zip -O /usr/local/lib/gradle.zip
+RUN wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -O /usr/local/lib/gradle.zip
 
 # swagger-codegen-cli, used to build the API docs
 RUN wget \
