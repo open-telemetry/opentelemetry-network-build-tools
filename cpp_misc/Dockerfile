@@ -42,7 +42,7 @@ RUN PATH=$PATH:$HOME/build/breakpad/depot_tools fetch breakpad
 
 # configure breakpad to avoid using getrandom() to reduce GLIBC_2.25 dependency
 RUN CXXFLAGS="-Wno-narrowing" src/configure ac_cv_func_getrandom=no --prefix=$HOME/install
-RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; nice make -j$NPROC && nice make install
+RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; nice make -j${NPROC:-3} && nice make install
 
 # args
 WORKDIR $HOME
@@ -59,7 +59,7 @@ RUN cmake \
   -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
   -DJSON_BuildTests=OFF \
   .
-RUN cmake --build . --target install -j $NPROC --config $CMAKE_BUILD_TYPE
+RUN nice cmake --build . --target install -j ${NPROC:-3} --config $CMAKE_BUILD_TYPE
 
 # spdlog
 WORKDIR $HOME
@@ -72,7 +72,7 @@ RUN cmake \
   -DSPDLOG_BUILD_EXAMPLES=OFF \
   -DSPDLOG_BUILD_TESTING=OFF \
   .
-RUN cmake --build . --target install -j $NPROC --config $CMAKE_BUILD_TYPE
+RUN nice cmake --build . --target install -j ${NPROC:-3} --config $CMAKE_BUILD_TYPE
 
 # ccan
 WORKDIR $HOME
@@ -89,7 +89,7 @@ RUN cmake \
   -DBUILD_GMOCK=ON \
   -DINSTALL_GTEST=OFF \
   .
-RUN cmake --build . -j $NPROC --config $CMAKE_BUILD_TYPE
+RUN nice cmake --build . -j ${NPROC:-3} --config $CMAKE_BUILD_TYPE
 RUN cp lib/*.a $HOME/install/lib
 RUN cp -R googletest/include/gtest $HOME/install/include
 RUN cp -R googlemock/include/gmock $HOME/install/include

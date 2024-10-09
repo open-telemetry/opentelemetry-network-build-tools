@@ -28,5 +28,5 @@ RUN ./Configure linux-x86_64 \
 	no-mdc2 no-ocb no-rc2 no-rmd160 no-scrypt no-whirlpool
 # would also want 	--api=1.1.0  but AWS CLI is built on 1.0.2 API
 # no-ui, no-sock conflict with curl
-RUN nice make -j$NPROC
+RUN nice make -j${NPROC:-3}
 RUN nice make install

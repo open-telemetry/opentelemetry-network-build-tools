@@ -11,6 +11,7 @@ FROM $base_IMAGE_TAG
 
 ARG CMAKE_BUILD_TYPE
 ARG CURL_LIBRARY
+ARG NPROC
 
 ######################
 # openssl dependency #
@@ -47,7 +48,7 @@ RUN nice cmake \
 	-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
 	-DCMAKE_DEBUG_POSTFIX="" \
 	$HOME/curl
-RUN nice make -j$NPROC && nice make -j$NPROC install
+RUN nice make -j${NPROC:-3} && nice make -j${NPROC:-3} install
 
 ##########
 # curlpp #
@@ -61,4 +62,4 @@ RUN nice cmake \
 	-DCMAKE_PREFIX_PATH:PATH=$HOME/install \
 	-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
 	$HOME/curlpp
-RUN nice make -j$NPROC && nice make -j$NPROC install
+RUN nice make -j${NPROC:-3} && nice make -j${NPROC:-3} install

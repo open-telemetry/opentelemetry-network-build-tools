@@ -42,8 +42,8 @@ RUN nice cmake \
 	-DCMAKE_C_FLAGS="-fPIC" \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
 	$HOME/google-cloud-cpp-common
-RUN nice make -j$NPROC
-RUN nice make -j$NPROC install
+RUN nice make -j${NPROC:-3}
+RUN nice make -j${NPROC:-3} install
 
 ####################
 # google-cloud-cpp #
@@ -67,5 +67,5 @@ RUN nice cmake \
 	-DCMAKE_C_FLAGS="-fPIC" \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
 	$HOME/google-cloud-cpp
-RUN nice make -j$NPROC
-#RUN nice make -j$NPROC install
+RUN nice make -j${NPROC:-3}
+#RUN nice make -j${NPROC:-3} install
