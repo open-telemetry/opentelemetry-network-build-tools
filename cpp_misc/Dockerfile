@@ -44,10 +44,6 @@ RUN PATH=$PATH:$HOME/build/breakpad/depot_tools fetch breakpad
 RUN CXXFLAGS="-Wno-narrowing" src/configure ac_cv_func_getrandom=no --prefix=$HOME/install
 RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; nice make -j$NPROC && nice make install
 
-# remove gtest and gmock includes installed by breakpad
-RUN rm -r $HOME/install/include/gtest
-RUN rm -r $HOME/install/include/gmock
-
 # args
 WORKDIR $HOME
 COPY args args
