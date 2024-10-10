@@ -76,7 +76,8 @@ jobs:
           echo "git_short_hash = ${git_short_hash}"
       - name: Build build-env container
         run: |
-            ./build.sh
+          cd $GITHUB_WORKSPACE/src
+          ./build.sh
       - name: Push to container registry
         run: |
           cd $GITHUB_WORKSPACE/src
