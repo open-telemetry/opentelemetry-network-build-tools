@@ -47,6 +47,9 @@ jobs:
     name: Build and release
     runs-on: ubuntu-20.04
     steps:
+      - name: Log-in to container registry
+        run: |
+          docker login --username="$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY <<< "$DOCKER_PASSWORD"
       - name: Checkout sources
         uses: actions/checkout@v3
         with:
@@ -71,9 +74,6 @@ jobs:
           echo "inputs.image_prefix = ${{ inputs.image_prefix }}"
           echo "inputs.dry_run = ${{ inputs.dry_run }}"
           echo "git_short_hash = ${git_short_hash}"
-      - name: Log-in to container registry
-        run: |
-          docker login --username="$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY <<< "$DOCKER_PASSWORD"
       - name: Build build-env container
         run: |
             ./build.sh
