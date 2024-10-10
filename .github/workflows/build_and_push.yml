@@ -24,7 +24,7 @@ on:
         description: "Prefix to use for destination image name"
         required: false
         type: string
-        default: "opentelemetry-ebpf-"
+        default: "opentelemetry-network-"
       additional_tag:
         description: "Additional tag to use when pushing to docker repository"
         required: false
