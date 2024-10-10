@@ -7,14 +7,6 @@ run-name: Create a build-env container and push to docker hub
 on:
   workflow_dispatch:
     inputs:
-      release_type:
-        description: "Release type"
-        required: true
-        type: choice
-        options:
-          - public
-          - unofficial
-        default: public
       ref:
         description: "Tag, branch or SHA to checkout"
         required: true
