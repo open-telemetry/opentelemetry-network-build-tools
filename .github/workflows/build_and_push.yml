@@ -74,6 +74,10 @@ jobs:
           echo "inputs.image_prefix = ${{ inputs.image_prefix }}"
           echo "inputs.dry_run = ${{ inputs.dry_run }}"
           echo "git_short_hash = ${git_short_hash}"
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y cmake build-essential
       - name: Build build-env container
         run: |
           cd $GITHUB_WORKSPACE/src
