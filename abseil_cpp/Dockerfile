@@ -16,4 +16,4 @@ WORKDIR $HOME/abseil-cpp
 RUN nice cmake -DCMAKE_CXX_STANDARD=17 \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install . && \
-  nice make all install -j$NPROC
+  nice make all install -j${NPROC:-3}

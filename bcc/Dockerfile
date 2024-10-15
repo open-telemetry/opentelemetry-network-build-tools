@@ -7,7 +7,7 @@ ARG base_IMAGE_TAG
 FROM $base_IMAGE_TAG
 
 ARG CMAKE_BUILD_TYPE
-ARG RESTRICTED_NPROC=1
+ARG RESTRICTED_NPROC
 
 RUN apt-get install --no-install-recommends -y zip
 
@@ -21,4 +21,4 @@ RUN cmake \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
   -DENABLE_LLVM_SHARED=OFF \
   $HOME/bcc
-RUN nice ninja -j $RESTRICTED_NPROC && ninja -j $RESTRICTED_NPROC install
+RUN nice ninja -j ${RESTRICTED_NPROC:-1} && ninja -j ${RESTRICTED_NPROC:-1} install

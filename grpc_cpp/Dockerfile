@@ -13,6 +13,9 @@ FROM $openssl_IMAGE_TAG as build-openssl
 FROM $abseil_cpp_IMAGE_TAG as build-abseil
 FROM $base_IMAGE_TAG
 
+# need to redeclare after FROM
+ARG NPROC
+
 WORKDIR $HOME
 
 COPY grpc grpc
@@ -41,4 +44,4 @@ RUN cmake \
   -DCMAKE_INSTALL_PREFIX="$HOME/install" \
   $HOME/grpc
 
-RUN make -j$NPROC install
+RUN nice make -j${NPROC:-3} install

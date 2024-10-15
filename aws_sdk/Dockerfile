@@ -12,6 +12,8 @@ FROM $openssl_IMAGE_TAG as build-openssl
 FROM $curl_IMAGE_TAG as build-curl
 FROM $base_IMAGE_TAG
 
+ARG NPROC
+
 WORKDIR $HOME
 
 COPY aws-sdk-cpp aws-sdk-cpp
@@ -34,5 +36,5 @@ RUN cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install \
   $HOME/aws-sdk-cpp
 
-RUN nice make -j$NPROC
+RUN nice make -j${NPROC:-3}
 RUN nice make install
