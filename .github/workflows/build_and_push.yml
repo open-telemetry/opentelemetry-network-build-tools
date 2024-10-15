@@ -37,7 +37,8 @@ env:
 jobs:
   build-and-release:
     name: Build and release
-    runs-on: ubuntu-20.04
+    runs-on:
+      labels: otel-linux-latest-2-cores
     steps:
       - name: Log-in to container registry
         run: |
