@@ -38,7 +38,7 @@ jobs:
   build-and-release:
     name: Build and release
     runs-on:
-      labels: otel-linux-latest-2-cores
+      labels: otel-linux-latest-4-cores
     steps:
       - name: Log-in to container registry
         run: |
