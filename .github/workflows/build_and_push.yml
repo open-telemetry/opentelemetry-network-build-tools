@@ -30,8 +30,8 @@ on:
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-  DOCKER_NAMESPACE: ${{ vars.DOCKER_NAMESPACE }}
+  DOCKER_REGISTRY: docker.io
+  DOCKER_NAMESPACE: otel
   IMAGE_PREFIX: ${{ inputs.image_prefix }}
 
 jobs:
@@ -88,23 +88,18 @@ jobs:
             tags=(${tags[@]} "${{ inputs.additional_tag }}")
           fi
 
-          images=(
-            build-env
-          )
-
           # strip potential "https://" prefix and trailing slashes from docker registry
           docker_registry=$(sed -e 's,^https://,,' -e 's,/*$,,' <<< $DOCKER_REGISTRY)
 
-          for image in ${images[@]}; do
-            image_name="${IMAGE_PREFIX}${image}"
-            image_path="${docker_registry}/${DOCKER_NAMESPACE}/${image_name}"
+          image="build-env"
+          image_name="${IMAGE_PREFIX}build-tools"
+          image_path="${docker_registry}/${DOCKER_NAMESPACE}/${image_name}"
 
-            for tag in ${tags[@]}; do
-              docker tag $image ${image_path}:${tag}
-              if [[ "${{ inputs.dry_run }}" == "false" ]]; then
-                docker push ${image_path}:${tag}
-              fi
-            done
+          for tag in ${tags[@]}; do
+            docker tag $image ${image_path}:${tag}
+            if [[ "${{ inputs.dry_run }}" == "false" ]]; then
+              docker push ${image_path}:${tag}
+            fi
           done
 
           docker images --no-trunc
