@@ -24,6 +24,12 @@ To work with this repository on MacOS, you need:
 ### Other Platform Prerequisites
 **TBD**
 
+## Workflow
+
+1. Fork the repository
+2. Work on own branch
+3. Create a PR to fix an issue
+
 ## Local Run/Build
 
 ### How to set up and run the project locally
