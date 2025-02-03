@@ -41,12 +41,16 @@ This guide outlines best practices and requirements to ensure a smooth and effec
 
 ### Adhering to Coding Standards
 Follow the project's coding standards outlined in **TBD**.
+
 Use clear and concise naming conventions for variables, functions, and files.
+
 Run linters or formatters where applicable to maintain consistent code style.
 
 ### Community Standards and Style Guides
 This project adheres to the OpenTelemetry community's standards. Please ensure you:
+
 Follow the [Code of Conduct](https://github.com/open-telemetry/community/blob/main/code-of-conduct.md).
+
 Align with any specific style guides, such as **TBD**.
 
 ## Further Help
