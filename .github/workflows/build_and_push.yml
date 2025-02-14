@@ -37,8 +37,7 @@ env:
 jobs:
   build-and-release:
     name: Build and release
-    runs-on:
-      labels: otel-linux-latest-4-cores
+    runs-on: ubuntu-latest
     steps:
       - name: Log-in to container registry
         run: |
