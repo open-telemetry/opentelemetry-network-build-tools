@@ -40,10 +40,9 @@ Run the build script:
 Use clear and concise naming conventions for variables, functions, and files.
 
 ### Community Standards and Style Guides
+
 This project adheres to the OpenTelemetry community's standards. Please ensure you:
 
 Follow the [Code of Conduct](https://github.com/open-telemetry/community/blob/main/code-of-conduct.md).
-
-Align with any specific style guides, such as **TBD**.
 
 Thank you for contributing to OpenTelemetry-eBPF Build Tools! 🎉
