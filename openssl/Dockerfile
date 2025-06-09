@@ -16,7 +16,7 @@ WORKDIR $HOME/openssl
 # remove getentropy() from crypto/rand/rand_unix.c to avoid dependency on GLIBC_2.25
 RUN cat crypto/rand/rand_unix.c | perl -pe 'BEGIN{undef $/;} s/extern int getentropy.*?#  endif/\n#  endif/smg' > /tmp/rand_unix.c && cp /tmp/rand_unix.c crypto/rand
 
-RUN ./Configure linux-x86_64 \
+RUN ./Configure linux-$(uname -m) \
 	--prefix=$HOME/install/openssl \
 	--openssldir=$HOME/install/openssl \
 	${CONFIGURE_RELEASE_DEBUG} \

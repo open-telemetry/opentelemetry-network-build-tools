@@ -40,6 +40,9 @@ WORKDIR $HOME/build/breakpad
 RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 RUN PATH=$PATH:$HOME/build/breakpad/depot_tools fetch breakpad
 
+# Switch to a version before the c++20 change that isn't supported in debian bullseye
+RUN cd src && git checkout 2c73630 && cd ..
+
 # configure breakpad to avoid using getrandom() to reduce GLIBC_2.25 dependency
 RUN CXXFLAGS="-Wno-narrowing" src/configure ac_cv_func_getrandom=no --prefix=$HOME/install
 RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; nice make -j${NPROC:-3} && nice make install
