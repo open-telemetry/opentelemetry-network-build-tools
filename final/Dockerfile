@@ -66,8 +66,15 @@ ARG PKG_EXTRA_PACKAGES="openjdk-${BENV_JAVA_VERSION}-jdk-headless google-cloud-s
 RUN apt-get -y update && apt-get install -y --no-install-recommends $PKG_EXTRA_PACKAGES
 
 ## java version required by render framework parser
-RUN update-alternatives --set java /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-amd64/bin/java
-RUN update-alternatives --set javac /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-amd64/bin/javac
+RUN case $(uname -m) in \
+      x86_64) update-alternatives --set java /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-amd64/bin/java && \
+              update-alternatives --set javac /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-amd64/bin/javac \
+              ;; \
+      aarch64) update-alternatives --set java /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-arm64/bin/java  && \
+              update-alternatives --set javac /usr/lib/jvm/java-${BENV_JAVA_VERSION}-openjdk-arm64/bin/javac \
+              ;; \
+    esac
+
 
 # gradle
 RUN wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -O /usr/local/lib/gradle.zip
