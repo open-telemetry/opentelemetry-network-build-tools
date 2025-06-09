@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ARG BENV_BASE_IMAGE_DISTRO=debian
-ARG BENV_BASE_IMAGE_VERSION=bullseye
+ARG BENV_BASE_IMAGE_VERSION=bullseye@sha256:cf48c31af360e1c0a0aedd33aae4d928b68c2cdf093f1612650eb1ff434d1c34
 FROM ${BENV_BASE_IMAGE_DISTRO}:${BENV_BASE_IMAGE_VERSION} AS build-main
 
 ################ DEPENDENCIES ################
