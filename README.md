@@ -32,4 +32,4 @@ Use `add_dependency.sh` and follow instructions.
 - [Jim Wilson](https://github.com/jmw51798), Splunk
 - [Jonathan Perry](https://github.com/yonch), Splunk
 
-For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
+For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
