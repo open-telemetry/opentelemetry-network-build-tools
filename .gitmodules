@@ -56,3 +56,6 @@
 [submodule "opentelemetry/opentelemetry-proto"]
 	path = opentelemetry/opentelemetry-proto
 	url = https://github.com/open-telemetry/opentelemetry-proto.git
+[submodule "libbpf/libbpf"]
+	path = libbpf/libbpf
+	url = https://github.com/libbpf/libbpf.git
