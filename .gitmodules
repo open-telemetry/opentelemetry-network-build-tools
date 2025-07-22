@@ -59,3 +59,6 @@
 [submodule "libbpf/libbpf"]
 	path = libbpf/libbpf
 	url = https://github.com/libbpf/libbpf.git
+[submodule "libbpf/bpftool"]
+	path = libbpf/bpftool
+	url = https://github.com/libbpf/bpftool.git
