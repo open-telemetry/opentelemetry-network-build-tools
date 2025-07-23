@@ -13,6 +13,8 @@ WORKDIR $HOME
 COPY bcc bcc
 WORKDIR $HOME/build/bcc
 
+RUN echo $PATH
+
 RUN cmake \
   -G Ninja \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install \
