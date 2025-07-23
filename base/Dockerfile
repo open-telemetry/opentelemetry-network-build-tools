@@ -93,12 +93,12 @@ ENV HOME=/home/${UNAME}
 WORKDIR $HOME
 
 RUN set -ex; \
-    id | grep "uid=${UID}(${UNAME}) gid=${GID}(${GNAME})"; \
-    sudo ls; \
-    pwd | grep "^/home/${UNAME}"; \
-    echo $HOME | grep "^/home/${UNAME}"; \
-    touch $HOME/test; \
-    rm $HOME/test
+    id | grep "uid=${UID}(${UNAME}) gid=${GID}(${GNAME})" || (echo "ERROR: User ID verification failed" && exit 1); \
+    sudo ls || (echo "ERROR: sudo test failed" && exit 1); \
+    pwd | grep "^/home/${UNAME}" || (echo "ERROR: Working directory verification failed" && exit 1); \
+    echo $HOME | grep "^/home/${UNAME}" || (echo "ERROR: HOME directory verification failed" && exit 1); \
+    touch $HOME/test || (echo "ERROR: File creation test failed" && exit 1); \
+    rm $HOME/test || (echo "ERROR: File removal test failed" && exit 1)
 
 # setup path
 ENV PATH="$HOME/install/bin:/usr/local/go/bin:${PATH}"
