@@ -78,6 +78,30 @@ RUN wget \
   https://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.12/swagger-codegen-cli-2.4.12.jar \
   -O /usr/local/lib/swagger-codegen-cli.jar
 
+ARG UNAME=user
+ARG UID=1000
+ARG GNAME=user
+ARG GID=1000
+RUN set -x; \
+    # These commands are allowed to fail (it happens for root, for example).
+    # The result will be checked in the next RUN.
+    userdel -r `getent passwd ${UID} | cut -d : -f 1` > /dev/null 2>&1; \
+    groupdel -f `getent group ${GID} | cut -d : -f 1` > /dev/null 2>&1; \
+    groupadd -g ${GID} ${GNAME}; \
+    useradd -u $UID -g $GID -G sudo -ms /bin/bash ${UNAME}; \
+    echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER ${UNAME}:${GNAME}
+WORKDIR $HOME
+
+RUN set -ex; \
+    id | grep "uid=${UID}(${UNAME}) gid=${GID}(${GNAME})"; \
+    sudo ls; \
+    pwd | grep "^/home/${UNAME}"; \
+    echo $HOME | grep "^/home/${UNAME}"; \
+    touch $HOME/test; \
+    rm $HOME/test
+
 # setup path
 ENV PATH="$HOME/install/bin:/usr/local/go/bin:${PATH}"
 
@@ -101,7 +125,6 @@ RUN pip3 install pcpp
 
 # add a script to setup build inside of container
 # to be run after we build the image.
-WORKDIR $HOME
 RUN ln -s $HOME/src/dev/benv-build.sh build.sh
 
 # Licensing information
