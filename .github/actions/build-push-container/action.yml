@@ -54,15 +54,6 @@ runs:
         ref: ${{ inputs.ref }}
         fetch-depth: 0
 
-    - name: Initialize directory-specific submodules
-      shell: bash
-      run: |
-        DIRECTORY="${{ inputs.directory }}"
-        echo "Initializing submodules for directory: ${DIRECTORY}"
-        
-        # Initialize submodules for the specific directory path
-        git submodule update --init --recursive -- "${DIRECTORY}/"
-
     - name: Compute recursive tags for all directories
       id: compute-recursive-tags
       shell: bash
@@ -215,6 +206,17 @@ runs:
           echo "exists=false" >> $GITHUB_OUTPUT
           echo "Image ${FULL_IMAGE_TAG} does not exist in registry"
         fi
+
+    - name: Initialize directory submodules
+      if: steps.check-exists.outputs.exists == 'false'
+      shell: bash
+      run: |
+        DIRECTORY="${{ inputs.directory }}"
+        echo "Initializing submodules for directory: ${DIRECTORY}"
+        
+        # Initialize submodules for the specific directory path
+        git submodule update --init --recursive -- "${DIRECTORY}/"
+
 
     - name: Log in to Container Registry
       if: steps.check-exists.outputs.exists == 'false'
