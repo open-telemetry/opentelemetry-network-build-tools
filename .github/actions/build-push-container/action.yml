@@ -72,22 +72,24 @@ runs:
         VERSION_HASH=$(git log -1 --format=%h "${DIRECTORY}")
         REPO_OWNER="${{ github.repository_owner }}"
         IMAGE_TAG="${REPO_OWNER}/${{ inputs.image_prefix }}-${DIRECTORY}:${VERSION_HASH}"
+        FULL_IMAGE_TAG="${{ inputs.registry }}/${IMAGE_TAG}"
         echo "image-tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+        echo "full-image-tag=${FULL_IMAGE_TAG}" >> $GITHUB_OUTPUT
         echo "Computed image tag: ${IMAGE_TAG}"
+        echo "Full image tag: ${FULL_IMAGE_TAG}"
 
     - name: Check if image exists in registry
       id: check-exists
       shell: bash
       run: |
-        IMAGE_TAG="${{ steps.compute-tag.outputs.image-tag }}"
-        FULL_IMAGE_PATH="${{ inputs.registry }}/${IMAGE_TAG}"
+        FULL_IMAGE_TAG="${{ steps.compute-tag.outputs.full-image-tag }}"
         
-        if docker manifest inspect "${FULL_IMAGE_PATH}" >/dev/null 2>&1; then
+        if docker manifest inspect "${FULL_IMAGE_TAG}" >/dev/null 2>&1; then
           echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Image ${FULL_IMAGE_PATH} already exists in registry"
+          echo "Image ${FULL_IMAGE_TAG} already exists in registry"
         else
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Image ${FULL_IMAGE_PATH} does not exist in registry"
+          echo "Image ${FULL_IMAGE_TAG} does not exist in registry"
         fi
 
     - name: Log in to Container Registry
@@ -103,13 +105,12 @@ runs:
       shell: bash
       run: |
         DIRECTORY="${{ inputs.directory }}"
-        IMAGE_TAG="${{ steps.compute-tag.outputs.image-tag }}"
-        FULL_IMAGE_PATH="${{ inputs.registry }}/${IMAGE_TAG}"
+        FULL_IMAGE_TAG="${{ steps.compute-tag.outputs.full-image-tag }}"
         
         # Start building the docker command
         BUILD_ARGS="--build-arg NPROC=$(nproc)"
         
-        # Add dependency image tags as build args
+        # Add dependency image tags as build args (with full registry path)
         if [ -n "${{ inputs.dependencies }}" ]; then
           # Extract the dependency mapping from CMakeLists.txt style
           case "${DIRECTORY}" in
@@ -117,59 +118,59 @@ runs:
               # No dependencies
               ;;
             "openssl"|"bcc"|"libuv"|"cpp_misc"|"go"|"abseil_cpp"|"libmaxminddb"|"libbpf")
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.dependencies }}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${{ inputs.dependencies }}"
               ;;
             "curl")
               # Dependencies: base openssl  
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
               ;;
             "grpc_cpp")
               # Dependencies: base abseil_cpp openssl
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${deps[1]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ inputs.registry }}/${deps[2]}"
               ;;
             "aws_sdk")
               # Dependencies: base openssl curl
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ inputs.registry }}/${deps[2]}"
               ;;
             "gcp_cpp")
               # Dependencies: base openssl curl grpc_cpp
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[3]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ inputs.registry }}/${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[3]}"
               ;;
             "opentelemetry")
               # Dependencies: base grpc_cpp
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
               ;;
             "final")
               # Dependencies: all components
               deps=(${{ inputs.dependencies }})
-              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${deps[3]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${deps[4]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${deps[5]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${deps[6]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${deps[7]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[8]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${deps[9]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${deps[10]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${deps[11]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${deps[12]}"
-              BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${deps[13]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.registry }}/${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ inputs.registry }}/${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ inputs.registry }}/${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${{ inputs.registry }}/${deps[3]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${{ inputs.registry }}/${deps[4]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${{ inputs.registry }}/${deps[5]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${{ inputs.registry }}/${deps[6]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${{ inputs.registry }}/${deps[7]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[8]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[9]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${{ inputs.registry }}/${deps[10]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${{ inputs.registry }}/${deps[11]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${{ inputs.registry }}/${deps[12]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${{ inputs.registry }}/${deps[13]}"
               ;;
           esac
         fi
@@ -184,15 +185,15 @@ runs:
         fi
         
         # Build the image
-        echo "Building image: ${FULL_IMAGE_PATH}"
+        echo "Building image: ${FULL_IMAGE_TAG}"
         echo "Build args: ${BUILD_ARGS}"
         
-        docker build -t "${FULL_IMAGE_PATH}" ${BUILD_ARGS} "${DIRECTORY}/"
+        docker build -t "${FULL_IMAGE_TAG}" ${BUILD_ARGS} "${DIRECTORY}/"
         
         # Push if not dry run
         if [[ "${{ inputs.dry_run }}" == "false" ]]; then
-          echo "Pushing image: ${FULL_IMAGE_PATH}"
-          docker push "${FULL_IMAGE_PATH}"
+          echo "Pushing image: ${FULL_IMAGE_TAG}"
+          docker push "${FULL_IMAGE_TAG}"
         else
-          echo "Dry run: would push image: ${FULL_IMAGE_PATH}"
+          echo "Dry run: would push image: ${FULL_IMAGE_TAG}"
         fi
