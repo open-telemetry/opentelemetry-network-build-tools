@@ -22,7 +22,7 @@ ARG NPROC
 WORKDIR $HOME
 COPY --chown=${UID}:${GID} lz4 lz4
 WORKDIR $HOME/lz4
-RUN make prefix=$HOME/install install
+RUN mkdir -p $HOME/install && make prefix=$HOME/install install
 
 # yaml-cpp
 WORKDIR $HOME
