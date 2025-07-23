@@ -1,0 +1,211 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+name: 'Build and Push Container'
+description: 'Build and push a Docker container with dependency management and registry caching'
+
+inputs:
+  directory:
+    description: 'Directory name to build'
+    required: true
+  dependencies:
+    description: 'Space-separated list of dependency image tags'
+    required: false
+    default: ''
+  registry:
+    description: 'Container registry to use'
+    required: true
+    default: 'ghcr.io'
+  registry_username:
+    description: 'Registry username'
+    required: true
+  registry_password:
+    description: 'Registry password/token'
+    required: true
+  image_prefix:
+    description: 'Prefix for image names'
+    required: false
+    default: 'benv'
+  dry_run:
+    description: 'Build but do not push'
+    required: false
+    default: 'false'
+  ref:
+    description: 'Git ref to checkout'
+    required: false
+    default: 'main'
+
+outputs:
+  image-tag:
+    description: 'The computed image tag'
+    value: ${{ steps.compute-tag.outputs.image-tag }}
+  image-exists:
+    description: 'Whether the image already exists in registry'
+    value: ${{ steps.check-exists.outputs.exists }}
+  build-needed:
+    description: 'Whether a build was needed'
+    value: ${{ steps.check-exists.outputs.exists == 'false' }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout sources
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        ref: ${{ inputs.ref }}
+        fetch-depth: 0
+
+    - name: Initialize directory-specific submodules
+      shell: bash
+      run: |
+        # Get all submodules for the specific directory
+        DIRECTORY="${{ inputs.directory }}"
+        echo "Initializing submodules for directory: ${DIRECTORY}"
+        
+        # Find all submodules that start with the directory path
+        SUBMODULES=$(git config --file .gitmodules --get-regexp '^submodule\..+\.path$' | \
+                    grep "^submodule\.[^.]*\.path ${DIRECTORY}/" | \
+                    cut -d' ' -f2-)
+        
+        if [ -n "$SUBMODULES" ]; then
+          echo "Found submodules for ${DIRECTORY}:"
+          echo "$SUBMODULES"
+          
+          # Use xargs to handle multiple submodules efficiently
+          echo "$SUBMODULES" | xargs -I {} git submodule update --init --recursive {}
+        else
+          echo "No submodules found for directory ${DIRECTORY}"
+        fi
+
+    - name: Compute image tag
+      id: compute-tag
+      shell: bash
+      run: |
+        DIRECTORY="${{ inputs.directory }}"
+        VERSION_HASH=$(git log -1 --format=%h "${DIRECTORY}")
+        REPO_OWNER="${{ github.repository_owner }}"
+        IMAGE_TAG="${REPO_OWNER}/${{ inputs.image_prefix }}-${DIRECTORY}:${VERSION_HASH}"
+        echo "image-tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+        echo "Computed image tag: ${IMAGE_TAG}"
+
+    - name: Check if image exists in registry
+      id: check-exists
+      shell: bash
+      run: |
+        IMAGE_TAG="${{ steps.compute-tag.outputs.image-tag }}"
+        FULL_IMAGE_PATH="${{ inputs.registry }}/${IMAGE_TAG}"
+        
+        if docker manifest inspect "${FULL_IMAGE_PATH}" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Image ${FULL_IMAGE_PATH} already exists in registry"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Image ${FULL_IMAGE_PATH} does not exist in registry"
+        fi
+
+    - name: Log in to Container Registry
+      if: steps.check-exists.outputs.exists == 'false'
+      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ inputs.registry_username }}
+        password: ${{ inputs.registry_password }}
+
+    - name: Build and push image
+      if: steps.check-exists.outputs.exists == 'false'
+      shell: bash
+      run: |
+        DIRECTORY="${{ inputs.directory }}"
+        IMAGE_TAG="${{ steps.compute-tag.outputs.image-tag }}"
+        FULL_IMAGE_PATH="${{ inputs.registry }}/${IMAGE_TAG}"
+        
+        # Start building the docker command
+        BUILD_ARGS="--build-arg NPROC=$(nproc)"
+        
+        # Add dependency image tags as build args
+        if [ -n "${{ inputs.dependencies }}" ]; then
+          # Extract the dependency mapping from CMakeLists.txt style
+          case "${DIRECTORY}" in
+            "base")
+              # No dependencies
+              ;;
+            "openssl"|"bcc"|"libuv"|"cpp_misc"|"go"|"abseil_cpp"|"libmaxminddb"|"libbpf")
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ inputs.dependencies }}"
+              ;;
+            "curl")
+              # Dependencies: base openssl  
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
+              ;;
+            "grpc_cpp")
+              # Dependencies: base abseil_cpp openssl
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[2]}"
+              ;;
+            "aws_sdk")
+              # Dependencies: base openssl curl
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
+              ;;
+            "gcp_cpp")
+              # Dependencies: base openssl curl grpc_cpp
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[3]}"
+              ;;
+            "opentelemetry")
+              # Dependencies: base grpc_cpp
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[1]}"
+              ;;
+            "final")
+              # Dependencies: all components
+              deps=(${{ inputs.dependencies }})
+              BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${deps[0]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${deps[1]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${deps[2]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${deps[3]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${deps[4]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${deps[5]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${deps[6]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${deps[7]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${deps[8]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${deps[9]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${deps[10]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${deps[11]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${deps[12]}"
+              BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${deps[13]}"
+              ;;
+          esac
+        fi
+        
+        # Add environment-specific build args if they exist
+        if [ -n "${BENV_BASE_IMAGE_DISTRO}" ]; then
+          BUILD_ARGS="${BUILD_ARGS} --build-arg BENV_BASE_IMAGE_DISTRO=${BENV_BASE_IMAGE_DISTRO}"
+        fi
+        
+        if [ -n "${BENV_BASE_IMAGE_VERSION}" ]; then
+          BUILD_ARGS="${BUILD_ARGS} --build-arg BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}"
+        fi
+        
+        # Build the image
+        echo "Building image: ${FULL_IMAGE_PATH}"
+        echo "Build args: ${BUILD_ARGS}"
+        
+        docker build -t "${FULL_IMAGE_PATH}" ${BUILD_ARGS} "${DIRECTORY}/"
+        
+        # Push if not dry run
+        if [[ "${{ inputs.dry_run }}" == "false" ]]; then
+          echo "Pushing image: ${FULL_IMAGE_PATH}"
+          docker push "${FULL_IMAGE_PATH}"
+        else
+          echo "Dry run: would push image: ${FULL_IMAGE_PATH}"
+        fi
