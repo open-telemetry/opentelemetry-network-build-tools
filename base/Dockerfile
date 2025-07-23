@@ -101,5 +101,5 @@ RUN set -ex; \
     rm $HOME/test || (echo "ERROR: File removal test failed" && exit 1)
 
 # setup path
-ENV PATH="$HOME/install/bin:/usr/local/go/bin:${PATH}"
+ENV PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
