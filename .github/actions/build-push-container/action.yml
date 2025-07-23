@@ -93,11 +93,11 @@ runs:
         declare -A DIRECT_HASHES
         ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
         
-        echo "Computing direct hashes..."
+        echo "Computing direct hashes..." >&2
         for dir in $ALL_DIRS; do
           direct_hash=$(git log -1 --format=%h "${dir}")
           DIRECT_HASHES[$dir]=$direct_hash
-          echo "Direct hash for $dir: $direct_hash"
+          echo "Direct hash for $dir: $direct_hash" >&2
         done
         
         # Function to compute dependency closure (all transitive dependencies)
@@ -164,8 +164,8 @@ runs:
           # Use the dash-separated hashes directly as the tag
           local final_hash="$hash_input"
           
-          echo "Closure for $dir: ${sorted_dirs[@]}"
-          echo "Final hash for $dir: $final_hash"
+          echo "Closure for $dir: ${sorted_dirs[@]}" >&2
+          echo "Final hash for $dir: $final_hash" >&2
           
           echo "$final_hash"
         }
@@ -181,12 +181,12 @@ runs:
         echo "full-image-tag=${FULL_IMAGE_TAG}" >> $GITHUB_OUTPUT
         echo "recursive-hash=${RECURSIVE_HASH}" >> $GITHUB_OUTPUT
         
-        echo "Computed recursive image tag: ${IMAGE_TAG}"
-        echo "Full image tag: ${FULL_IMAGE_TAG}"
-        echo "Recursive hash: ${RECURSIVE_HASH}"
+        echo "Computed recursive image tag: ${IMAGE_TAG}" >&2
+        echo "Full image tag: ${FULL_IMAGE_TAG}" >&2
+        echo "Recursive hash: ${RECURSIVE_HASH}" >&2
         
         # Compute all dependency tags for build args
-        echo "Computing all dependency tags..."
+        echo "Computing all dependency tags..." >&2
         ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
         
         for dir in $ALL_DIRS; do
@@ -199,7 +199,7 @@ runs:
             export "${dir}_IMAGE_TAG=${dir_full_tag}"
             echo "${dir}_IMAGE_TAG=${dir_full_tag}" >> $GITHUB_OUTPUT
             
-            echo "Dependency: ${dir} -> ${dir_full_tag}"
+            echo "Dependency: ${dir} -> ${dir_full_tag}" >&2
           fi
         done
 
