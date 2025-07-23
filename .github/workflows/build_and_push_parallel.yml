@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: build-and-push-parallel
-run-name: Create build-env containers in parallel with optimized caching
+run-name: Create a build-env container and push to docker hub
 
 on:
   workflow_dispatch:
