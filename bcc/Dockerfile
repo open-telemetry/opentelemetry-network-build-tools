@@ -10,7 +10,7 @@ ARG CMAKE_BUILD_TYPE
 ARG RESTRICTED_NPROC
 
 WORKDIR $HOME
-COPY bcc bcc
+COPY --chown=${UID}:${GID} bcc bcc
 WORKDIR $HOME/build/bcc
 
 RUN echo $PATH
