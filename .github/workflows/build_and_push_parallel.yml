@@ -49,9 +49,6 @@ jobs:
   build-base:
     name: Build base image
     runs-on: ubuntu-24.04
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -59,7 +56,6 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push base image
-        id: build
         uses: ./.github/actions/build-push-container//
         with:
           directory: base
@@ -74,9 +70,6 @@ jobs:
     name: Build openssl image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -84,11 +77,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push openssl image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: openssl
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -99,9 +90,6 @@ jobs:
     name: Build bcc image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -109,11 +97,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push bcc image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: bcc
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -124,9 +110,6 @@ jobs:
     name: Build libuv image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -134,11 +117,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push libuv image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: libuv
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -149,9 +130,6 @@ jobs:
     name: Build cpp_misc image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -159,11 +137,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push cpp_misc image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: cpp_misc
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -174,9 +150,6 @@ jobs:
     name: Build go image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -184,11 +157,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push go image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: go
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -199,9 +170,6 @@ jobs:
     name: Build abseil_cpp image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -209,11 +177,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push abseil_cpp image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: abseil_cpp
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -224,9 +190,6 @@ jobs:
     name: Build libmaxminddb image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -234,11 +197,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push libmaxminddb image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: libmaxminddb
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -249,9 +210,6 @@ jobs:
     name: Build libbpf image
     runs-on: ubuntu-24.04
     needs: build-base
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -259,11 +217,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push libbpf image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: libbpf
-          dependencies: ${{ needs.build-base.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -275,9 +231,6 @@ jobs:
     name: Build curl image
     runs-on: ubuntu-24.04
     needs: [build-base, build-openssl]
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -285,11 +238,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push curl image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: curl
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-openssl.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -301,9 +252,6 @@ jobs:
     name: Build grpc_cpp image
     runs-on: ubuntu-24.04
     needs: [build-base, build-abseil-cpp, build-openssl]
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -311,11 +259,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push grpc_cpp image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: grpc_cpp
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-abseil-cpp.outputs.image-tag }} ${{ needs.build-openssl.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -327,9 +273,6 @@ jobs:
     name: Build aws_sdk image
     runs-on: ubuntu-24.04
     needs: [build-base, build-openssl, build-curl]
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -337,11 +280,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push aws_sdk image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: aws_sdk
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-openssl.outputs.image-tag }} ${{ needs.build-curl.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -353,9 +294,6 @@ jobs:
     name: Build gcp_cpp image
     runs-on: ubuntu-24.04
     needs: [build-base, build-openssl, build-curl, build-grpc-cpp]
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -363,11 +301,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push gcp_cpp image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: gcp_cpp
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-openssl.outputs.image-tag }} ${{ needs.build-curl.outputs.image-tag }} ${{ needs.build-grpc-cpp.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -379,9 +315,6 @@ jobs:
     name: Build opentelemetry image
     runs-on: ubuntu-24.04
     needs: [build-base, build-grpc-cpp]
-    outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -389,11 +322,9 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Build and push opentelemetry image
-        id: build
         uses: ./.github/actions/build-push-container/
         with:
           directory: opentelemetry
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-grpc-cpp.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -422,7 +353,7 @@ jobs:
     ]
     outputs:
       image-tag: ${{ steps.build.outputs.image-tag }}
-      image-exists: ${{ steps.build.outputs.image-exists }}
+      full-image-tag: ${{ steps.build.outputs.full-image-tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -434,7 +365,6 @@ jobs:
         uses: ./.github/actions/build-push-container/
         with:
           directory: final
-          dependencies: ${{ needs.build-base.outputs.image-tag }} ${{ needs.build-openssl.outputs.image-tag }} ${{ needs.build-curl.outputs.image-tag }} ${{ needs.build-bcc.outputs.image-tag }} ${{ needs.build-libuv.outputs.image-tag }} ${{ needs.build-aws-sdk.outputs.image-tag }} ${{ needs.build-cpp-misc.outputs.image-tag }} ${{ needs.build-go.outputs.image-tag }} ${{ needs.build-grpc-cpp.outputs.image-tag }} ${{ needs.build-abseil-cpp.outputs.image-tag }} ${{ needs.build-libmaxminddb.outputs.image-tag }} ${{ needs.build-gcp-cpp.outputs.image-tag }} ${{ needs.build-opentelemetry.outputs.image-tag }} ${{ needs.build-libbpf.outputs.image-tag }}
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -469,8 +399,10 @@ jobs:
 
       - name: Pull, tag and push final image to Docker Hub
         run: |
-          # Pull the final image from GitHub Container Registry
-          CACHE_IMAGE="${{ env.CACHE_REGISTRY }}/${{ needs.build-final.outputs.image-tag }}"
+          # Use the recursive final image tag from the build job
+          CACHE_IMAGE="${{ needs.build-final.outputs.full-image-tag }}"
+          
+          echo "Pulling final image: ${CACHE_IMAGE}"
           docker pull "${CACHE_IMAGE}"
           
           # Compute git hash for additional tagging
