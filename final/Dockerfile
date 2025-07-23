@@ -2,15 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ARG base_IMAGE_TAG
-ARG openssl_IMAGE_TAG
-ARG curl_IMAGE_TAG
 ARG bcc_IMAGE_TAG
 ARG libuv_IMAGE_TAG
 ARG aws_sdk_IMAGE_TAG
 ARG cpp_misc_IMAGE_TAG
 ARG go_IMAGE_TAG
-ARG grpc_cpp_IMAGE_TAG
-ARG abseil_cpp_IMAGE_TAG
 ARG libmaxminddb_IMAGE_TAG
 ARG gcp_cpp_IMAGE_TAG
 ARG opentelemetry_IMAGE_TAG
@@ -18,15 +14,11 @@ ARG libbpf_IMAGE_TAG
 #gen:dep-arg
 
 FROM $base_IMAGE_TAG as build-main
-FROM $openssl_IMAGE_TAG as build-openssl
-FROM $curl_IMAGE_TAG as build-curl
 FROM $bcc_IMAGE_TAG as build-bcc
 FROM $libuv_IMAGE_TAG as build-libuv
 FROM $aws_sdk_IMAGE_TAG as build-aws-sdk
 FROM $cpp_misc_IMAGE_TAG as build-cpp-misc
 FROM $go_IMAGE_TAG as build-go
-FROM $grpc_cpp_IMAGE_TAG as build-grpc-cpp
-FROM $abseil_cpp_IMAGE_TAG as build-abseil-cpp
 FROM $libmaxminddb_IMAGE_TAG as build-libmaxminddb
 FROM $gcp_cpp_IMAGE_TAG as build-gcp_cpp
 FROM $opentelemetry_IMAGE_TAG as build-opentelemetry
@@ -92,13 +84,9 @@ ENV PATH="$HOME/install/bin:/usr/local/go/bin:${PATH}"
 # copy artifacts from individual builds
 COPY --from=build-bcc $HOME/install $HOME/install
 COPY --from=build-libuv $HOME/install $HOME/install
-COPY --from=build-curl $HOME/install $HOME/install
 COPY --from=build-aws-sdk $HOME/install $HOME/install
 COPY --from=build-cpp-misc $HOME/install $HOME/install
-COPY --from=build-openssl $HOME/install $HOME/install
-COPY --from=build-abseil-cpp $HOME/install $HOME/install
 COPY --from=build-libmaxminddb $HOME/install $HOME/install
-COPY --from=build-grpc-cpp $HOME/install $HOME/install
 COPY --from=build-gcp_cpp $HOME/install $HOME/install
 COPY --from=build-opentelemetry $HOME/install $HOME/install
 COPY --from=build-libbpf $HOME/install $HOME/install

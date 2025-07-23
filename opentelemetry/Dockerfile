@@ -4,17 +4,12 @@
 # opentelemetry
 
 ARG base_IMAGE_TAG
-ARG grpc_cpp_IMAGE_TAG
 
-FROM $grpc_cpp_IMAGE_TAG as build-grpc_cpp
 FROM $base_IMAGE_TAG
 
 WORKDIR $HOME
 COPY opentelemetry-proto opentelemetry-proto
 WORKDIR $HOME/opentelemetry-proto
-
-COPY --from=build-grpc_cpp $HOME/install/bin/protoc /usr/local/bin/protoc
-COPY --from=build-grpc_cpp $HOME/install/bin/grpc_cpp_plugin /usr/local/bin/protoc-gen-grpc-cpp
 
 # generate c++ grpc client library
 
