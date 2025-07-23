@@ -26,6 +26,11 @@ on:
         required: false
         type: boolean
         default: false
+      registry_workspace:
+        description: "Registry workspace/namespace to push images to"
+        required: false
+        type: string
+        default: "otel"
 
 permissions:
   contents: read
@@ -34,7 +39,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   DOCKER_REGISTRY: docker.io
-  DOCKER_NAMESPACE: otel
+  DOCKER_NAMESPACE: ${{ inputs.registry_workspace }}
   IMAGE_PREFIX: ${{ inputs.image_prefix }}
 
 jobs:
