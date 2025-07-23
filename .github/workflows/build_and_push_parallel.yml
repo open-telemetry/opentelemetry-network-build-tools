@@ -50,7 +50,6 @@ env:
   DOCKER_NAMESPACE: ${{ inputs.registry_workspace }}
 
 jobs:
-  # Base layer - no dependencies
   build-base:
     name: Build base image
     runs-on: ubuntu-24.04
@@ -64,28 +63,6 @@ jobs:
         uses: ./.github/actions/build-push-container//
         with:
           directory: base
-          registry: ${{ env.CACHE_REGISTRY }}
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
-
-  # Second layer - depends on base
-  build-openssl:
-    name: Build openssl image
-    runs-on: ubuntu-24.04
-    needs: build-base
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: Build and push openssl image
-        uses: ./.github/actions/build-push-container/
-        with:
-          directory: openssl
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
@@ -172,27 +149,6 @@ jobs:
           ref: ${{ inputs.ref }}
           force_rebuild: ${{ inputs.force_rebuild }}
 
-  build-abseil-cpp:
-    name: Build abseil_cpp image
-    runs-on: ubuntu-24.04
-    needs: build-base
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: Build and push abseil_cpp image
-        uses: ./.github/actions/build-push-container/
-        with:
-          directory: abseil_cpp
-          registry: ${{ env.CACHE_REGISTRY }}
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
-
   build-libmaxminddb:
     name: Build libmaxminddb image
     runs-on: ubuntu-24.04
@@ -233,51 +189,6 @@ jobs:
           ref: ${{ inputs.ref }}
           force_rebuild: ${{ inputs.force_rebuild }}
 
-  # Third layer - depends on base + openssl
-  build-curl:
-    name: Build curl image
-    runs-on: ubuntu-24.04
-    needs: [build-base, build-openssl]
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: Build and push curl image
-        uses: ./.github/actions/build-push-container/
-        with:
-          directory: curl
-          registry: ${{ env.CACHE_REGISTRY }}
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
-
-  # Fourth layer - depends on base + abseil_cpp + openssl
-  build-grpc-cpp:
-    name: Build grpc_cpp image
-    runs-on: ubuntu-24.04
-    needs: [build-base, build-abseil-cpp, build-openssl]
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: Build and push grpc_cpp image
-        uses: ./.github/actions/build-push-container/
-        with:
-          directory: grpc_cpp
-          registry: ${{ env.CACHE_REGISTRY }}
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
-
-  # Fifth layer - depends on base + openssl + curl
   build-aws-sdk:
     name: Build aws_sdk image
     runs-on: ubuntu-24.04
@@ -298,7 +209,6 @@ jobs:
           ref: ${{ inputs.ref }}
           force_rebuild: ${{ inputs.force_rebuild }}
 
-  # Sixth layer - depends on base + openssl + curl + grpc_cpp
   build-gcp-cpp:
     name: Build gcp_cpp image
     runs-on: ubuntu-24.04
@@ -319,7 +229,6 @@ jobs:
           ref: ${{ inputs.ref }}
           force_rebuild: ${{ inputs.force_rebuild }}
 
-  # Seventh layer - depends on base + grpc_cpp
   build-opentelemetry:
     name: Build opentelemetry image
     runs-on: ubuntu-24.04
@@ -340,7 +249,6 @@ jobs:
           ref: ${{ inputs.ref }}
           force_rebuild: ${{ inputs.force_rebuild }}
 
-  # Final layer - depends on all previous layers
   build-final:
     name: Build final image
     runs-on: ubuntu-24.04

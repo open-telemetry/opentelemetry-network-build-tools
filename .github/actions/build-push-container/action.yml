@@ -78,7 +78,7 @@ runs:
         
         # Compute direct hashes for all directories upfront
         declare -A DIRECT_HASHES
-        ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
+        ALL_DIRS="base bcc libuv cpp_misc go libmaxminddb libbpf aws_sdk gcp_cpp opentelemetry final"
         
         echo "Computing direct hashes..." >&2
         for dir in $ALL_DIRS; do
@@ -174,7 +174,6 @@ runs:
         
         # Compute all dependency tags for build args
         echo "Computing all dependency tags..." >&2
-        ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
         
         for dir in $ALL_DIRS; do
           if [[ "$dir" != "$DIRECTORY" ]]; then
@@ -238,16 +237,12 @@ runs:
         
         # Add all dependency image tags as build args using outputs from compute-recursive-tags step
         BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.base_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.openssl_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.bcc_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libuv_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.cpp_misc_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.go_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.abseil_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libmaxminddb_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libbpf_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.curl_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.grpc_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.aws_sdk_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.gcp_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.opentelemetry_IMAGE_TAG }}"
