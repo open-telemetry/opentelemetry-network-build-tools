@@ -92,6 +92,7 @@ RUN set -x; \
     echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER ${UNAME}:${GNAME}
+ENV HOME=/home/${UNAME}
 WORKDIR $HOME
 
 RUN set -ex; \
