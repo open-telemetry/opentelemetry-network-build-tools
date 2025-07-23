@@ -11,7 +11,7 @@ ARG BUILD_CFLAGS
 
 WORKDIR $HOME
 RUN sudo apt remove -y libuv1
-COPY libuv libuv
+COPY --chown=${UID}:${GID} libuv libuv
 WORKDIR $HOME/libuv
 RUN ./autogen.sh
 WORKDIR $HOME/build/libuv
