@@ -5,7 +5,7 @@
 
 ARG base_IMAGE_TAG
 
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 ARG NPROC
 ARG CMAKE_BUILD_TYPE
@@ -54,4 +54,8 @@ RUN nice cmake \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
 	$HOME/google-cloud-cpp
 RUN nice make -j${NPROC:-3}
-#RUN nice make -j${NPROC:-3} install
+RUN nice make -j${NPROC:-3} install
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/install $HOME/install

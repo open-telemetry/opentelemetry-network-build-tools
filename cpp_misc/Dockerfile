@@ -12,7 +12,7 @@
 # - googletest
 
 ARG base_IMAGE_TAG
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 ARG CMAKE_BUILD_TYPE
 ARG BUILD_CFLAGS
@@ -96,3 +96,7 @@ RUN nice cmake --build . -j ${NPROC:-3} --config $CMAKE_BUILD_TYPE
 RUN cp lib/*.a $HOME/install/lib
 RUN cp -R googletest/include/gtest $HOME/install/include
 RUN cp -R googlemock/include/gmock $HOME/install/include
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/install $HOME/install

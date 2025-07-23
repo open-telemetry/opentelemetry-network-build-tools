@@ -4,7 +4,7 @@
 # compile our own bcc
 
 ARG base_IMAGE_TAG
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 ARG CMAKE_BUILD_TYPE
 ARG RESTRICTED_NPROC
@@ -22,3 +22,7 @@ RUN cmake \
   -DENABLE_LLVM_SHARED=OFF \
   $HOME/bcc
 RUN nice ninja -j ${RESTRICTED_NPROC:-1} && ninja -j ${RESTRICTED_NPROC:-1} install
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/install $HOME/install
