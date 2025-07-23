@@ -61,6 +61,7 @@ RUN apt-get -y update && \
     apt-get -y install \
         $PKG_MAKE \
         $PKG_BCC && \
+    apt remove -y libuv1 && \
     apt-get upgrade -y --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

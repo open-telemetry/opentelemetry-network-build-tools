@@ -9,7 +9,6 @@ FROM $base_IMAGE_TAG
 ARG NPROC
 ARG BUILD_CFLAGS
 
-RUN apt remove -y libuv1
 WORKDIR $HOME
 COPY libuv libuv
 WORKDIR $HOME/libuv
