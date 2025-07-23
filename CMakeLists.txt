@@ -126,6 +126,7 @@ build_directory(gcp_cpp DEPENDS base openssl curl grpc_cpp)
 build_directory(abseil_cpp DEPENDS base)
 build_directory(libmaxminddb DEPENDS base)
 build_directory(opentelemetry DEPENDS base grpc_cpp)
+build_directory(libbpf DEPENDS base)
 #gen:dep-dir
 
 build_directory(
@@ -144,6 +145,7 @@ build_directory(
     libmaxminddb
     gcp_cpp
     opentelemetry
+    libbpf
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
