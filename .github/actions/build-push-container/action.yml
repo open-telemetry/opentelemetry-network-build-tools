@@ -235,22 +235,22 @@ runs:
         # Start building the docker command
         BUILD_ARGS="--build-arg NPROC=$(nproc)"
         
-        # Add all dependency image tags as build args using environment variables from previous step
-        if [[ -n "${base_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${base_IMAGE_TAG}"; fi
-        if [[ -n "${openssl_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${openssl_IMAGE_TAG}"; fi
-        if [[ -n "${bcc_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${bcc_IMAGE_TAG}"; fi
-        if [[ -n "${libuv_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${libuv_IMAGE_TAG}"; fi
-        if [[ -n "${cpp_misc_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${cpp_misc_IMAGE_TAG}"; fi
-        if [[ -n "${go_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${go_IMAGE_TAG}"; fi
-        if [[ -n "${abseil_cpp_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${abseil_cpp_IMAGE_TAG}"; fi
-        if [[ -n "${libmaxminddb_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${libmaxminddb_IMAGE_TAG}"; fi
-        if [[ -n "${libbpf_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${libbpf_IMAGE_TAG}"; fi
-        if [[ -n "${curl_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${curl_IMAGE_TAG}"; fi
-        if [[ -n "${grpc_cpp_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${grpc_cpp_IMAGE_TAG}"; fi
-        if [[ -n "${aws_sdk_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${aws_sdk_IMAGE_TAG}"; fi
-        if [[ -n "${gcp_cpp_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${gcp_cpp_IMAGE_TAG}"; fi
-        if [[ -n "${opentelemetry_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${opentelemetry_IMAGE_TAG}"; fi
-        if [[ -n "${final_IMAGE_TAG:-}" ]]; then BUILD_ARGS="${BUILD_ARGS} --build-arg final_IMAGE_TAG=${final_IMAGE_TAG}"; fi
+        # Add all dependency image tags as build args using outputs from compute-recursive-tags step
+        BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.base_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.openssl_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.bcc_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libuv_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.cpp_misc_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.go_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.abseil_cpp_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libmaxminddb_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libbpf_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.curl_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.grpc_cpp_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.aws_sdk_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.gcp_cpp_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.opentelemetry_IMAGE_TAG }}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg final_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.final_IMAGE_TAG }}"
         
         # Add environment-specific build args if they exist
         if [ -n "${BENV_BASE_IMAGE_DISTRO}" ]; then
