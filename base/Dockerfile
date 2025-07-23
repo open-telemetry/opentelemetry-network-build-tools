@@ -15,7 +15,7 @@ ENV BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}
 ARG GO_VERSION="1.21.0"
 
 # Package definitions
-ARG PKG_CORE="wget curl git gnupg bc aptitude netcat-openbsd"
+ARG PKG_CORE="wget curl git gnupg bc aptitude netcat-openbsd sudo"
 ARG PKG_TEXT="xxd sed ripgrep less jq"
 ARG PKG_COMPILERS="g++"
 ARG PKG_BUILD="ninja-build"
