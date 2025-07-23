@@ -9,8 +9,6 @@ FROM $base_IMAGE_TAG
 ARG CMAKE_BUILD_TYPE
 ARG RESTRICTED_NPROC
 
-RUN apt-get install --no-install-recommends -y zip pkg-config libelf-dev zlib1g-dev libbfd-dev libcap-dev
-
 WORKDIR $HOME
 COPY libbpf libbpf
 COPY bpftool bpftool

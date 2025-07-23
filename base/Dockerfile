@@ -29,6 +29,7 @@ ARG PKG_JAVA="default-jdk-headless"
 ARG PKG_LLVM="llvm-11-dev libclang-11-dev clang-11"
 ARG PKG_MAKE="cmake ccache autoconf autoconf-archive automake libtool make"
 ARG PKG_BCC="bison flex zip"
+ARG PKG_LIBBPF="zip pkg-config libelf-dev zlib1g-dev libbfd-dev libcap-dev"
 
 # setup apt (add non-free, contrib and backports)
 RUN [ "$BENV_BASE_IMAGE_DISTRO" != 'debian' ] || [ "$BENV_BASE_IMAGE_VERSION" != 'sid' ] \
@@ -55,7 +56,8 @@ RUN apt-get -y update && \
         $PKG_LIBS \
         $PKG_PY_TEST \
         $PKG_JAVA \
-        $PKG_LLVM && \
+        $PKG_LLVM \
+        $PKG_LIBBPF && \
     apt-get -y install \
         $PKG_MAKE \
         $PKG_BCC && \
