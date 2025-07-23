@@ -103,3 +103,9 @@ RUN set -ex; \
 ENV PATH="$HOME/install/bin:/usr/local/go/bin:$PATH"
 RUN echo 'export PATH="$HOME/install/bin:/usr/local/go/bin:$PATH"' >> $HOME/.profile
 
+# set UID, GID, UNAME, GNAME as environment variables
+ENV UID=${UID}
+ENV GID=${GID}
+ENV UNAME=${UNAME}
+ENV GNAME=${GNAME}
+
