@@ -74,8 +74,32 @@ RUN case $(uname -m) in \
    esac
 # recommended: add PATH=$PATH:/usr/local/go/bin to ~/.bashrc
 
-# upgrade packages to latest
-RUN apt-get upgrade -y --no-install-recommends
-
 ################ ENVIRONMENT ################
-ENV HOME=/root
+ARG UNAME=user
+ARG UID=1000
+ARG GNAME=user
+ARG GID=1000
+RUN set -x; \
+    # These commands are allowed to fail (it happens for root, for example).
+    # The result will be checked in the next RUN.
+    userdel -r `getent passwd ${UID} | cut -d : -f 1` > /dev/null 2>&1; \
+    groupdel -f `getent group ${GID} | cut -d : -f 1` > /dev/null 2>&1; \
+    groupadd -g ${GID} ${GNAME}; \
+    useradd -u $UID -g $GID -G sudo -ms /bin/bash ${UNAME}; \
+    echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER ${UNAME}:${GNAME}
+ENV HOME=/home/${UNAME}
+WORKDIR $HOME
+
+RUN set -ex; \
+    id | grep "uid=${UID}(${UNAME}) gid=${GID}(${GNAME})"; \
+    sudo ls; \
+    pwd | grep "^/home/${UNAME}"; \
+    echo $HOME | grep "^/home/${UNAME}"; \
+    touch $HOME/test; \
+    rm $HOME/test
+
+# setup path
+ENV PATH="$HOME/install/bin:/usr/local/go/bin:${PATH}"
+
