@@ -10,7 +10,7 @@ ARG CONFIGURE_RELEASE_DEBUG
 ARG NPROC
 
 WORKDIR $HOME
-COPY openssl openssl
+COPY --chown=${UID}:${GID} openssl openssl
 WORKDIR $HOME/openssl
 
 # remove getentropy() from crypto/rand/rand_unix.c to avoid dependency on GLIBC_2.25

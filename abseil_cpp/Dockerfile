@@ -11,7 +11,7 @@ ARG CMAKE_BUILD_TYPE
 ARG NPROC
 
 WORKDIR $HOME
-COPY abseil-cpp abseil-cpp
+COPY --chown=${UID}:${GID} abseil-cpp abseil-cpp
 WORKDIR $HOME/abseil-cpp
 RUN nice cmake -DCMAKE_CXX_STANDARD=17 \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \

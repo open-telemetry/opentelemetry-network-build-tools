@@ -8,7 +8,7 @@ ARG base_IMAGE_TAG
 FROM $base_IMAGE_TAG
 
 WORKDIR $HOME
-COPY opentelemetry-proto opentelemetry-proto
+COPY --chown=${UID}:${GID} opentelemetry-proto opentelemetry-proto
 WORKDIR $HOME/opentelemetry-proto
 
 # generate c++ grpc client library

@@ -18,7 +18,7 @@ ARG NPROC
 
 WORKDIR $HOME
 
-COPY grpc grpc
+COPY --chown=${UID}:${GID} grpc grpc
 
 COPY --from=build-abseil $HOME/install $HOME/abseil
 COPY --from=build-openssl $HOME/install/openssl $HOME/openssl

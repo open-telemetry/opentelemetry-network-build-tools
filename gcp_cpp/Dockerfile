@@ -15,14 +15,14 @@ ARG CMAKE_BUILD_TYPE
 ##############
 
 WORKDIR $HOME
-COPY googleapis googleapis
+COPY --chown=${UID}:${GID} googleapis googleapis
 
 ###########################
 # google-cloud-cpp-common #
 ###########################
 
 WORKDIR $HOME
-COPY google-cloud-cpp-common google-cloud-cpp-common
+COPY --chown=${UID}:${GID} google-cloud-cpp-common google-cloud-cpp-common
 WORKDIR $HOME/build/google-cloud-cpp-common
 
 RUN nice cmake \
@@ -40,7 +40,7 @@ RUN nice make -j${NPROC:-3} install
 ####################
 
 WORKDIR $HOME
-COPY google-cloud-cpp google-cloud-cpp
+COPY --chown=${UID}:${GID} google-cloud-cpp google-cloud-cpp
 WORKDIR $HOME/build/google-cloud-cpp
 
 RUN nice cmake \

@@ -12,7 +12,7 @@ ARG NPROC
 
 WORKDIR $HOME
 
-COPY aws-sdk-cpp aws-sdk-cpp
+COPY --chown=${UID}:${GID} aws-sdk-cpp aws-sdk-cpp
 
 WORKDIR $HOME/build/aws-sdk-cpp
 

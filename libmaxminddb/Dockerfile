@@ -10,7 +10,7 @@ ARG CONFIGURE_ENABLE_DEBUG
 ARG NPROC
 
 WORKDIR $HOME
-COPY libmaxminddb libmaxminddb
+COPY --chown=${UID}:${GID} libmaxminddb libmaxminddb
 WORKDIR $HOME/libmaxminddb
 RUN ./bootstrap
 RUN ./configure ${CONFIGURE_ENABLE_DEBUG} --prefix=$HOME/install \

@@ -10,8 +10,8 @@ ARG CMAKE_BUILD_TYPE
 ARG RESTRICTED_NPROC
 
 WORKDIR $HOME
-COPY libbpf libbpf
-COPY bpftool bpftool
+COPY --chown=${UID}:${GID} libbpf libbpf
+COPY --chown=${UID}:${GID} bpftool bpftool
 
 # Build libbpf first
 WORKDIR $HOME/libbpf/src

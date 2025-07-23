@@ -24,7 +24,7 @@ COPY --from=benv-openssl $HOME/install/openssl $HOME/openssl
 ########
 
 WORKDIR $HOME
-COPY curl curl
+COPY --chown=${UID}:${GID} curl curl
 WORKDIR $HOME/build/curl
 
 # note: HAVE_FILE_OFFSET_BITS is unset to avoid GLIBC_2.28 dependency on fcntl64
@@ -55,7 +55,7 @@ RUN nice make -j${NPROC:-3} && nice make -j${NPROC:-3} install
 ##########
 
 WORKDIR $HOME
-COPY curlpp curlpp
+COPY --chown=${UID}:${GID} curlpp curlpp
 WORKDIR $HOME/build/curlpp
 RUN nice cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install \
