@@ -14,6 +14,22 @@ ENV BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}
 
 ARG GO_VERSION="1.21.0"
 
+# Package definitions
+ARG PKG_CORE="wget curl git gnupg bc aptitude netcat-openbsd"
+ARG PKG_TEXT="xxd sed ripgrep less jq"
+ARG PKG_COMPILERS="g++"
+ARG PKG_BUILD="ninja-build"
+ARG PKG_LINTERS="clang-format clang-tidy shellcheck"
+ARG PKG_MANAGERS="pkg-config rpm"
+ARG PKG_KERNEL="dkms build-essential"
+ARG PKG_DEV="gdb cgdb tmux strace"
+ARG PKG_LIBS="libc-ares-dev libelf-dev libssl-dev libzstd-dev libgrpc-dev libcurl4-openssl-dev libabsl-dev protobuf-compiler-grpc"
+ARG PKG_PY_TEST="python3-pytest python3-dev python3-pip python3-setuptools python3-wheel pylint3"
+ARG PKG_JAVA="default-jdk-headless"
+ARG PKG_LLVM="llvm-11-dev libclang-11-dev clang-11"
+ARG PKG_MAKE="cmake ccache autoconf autoconf-archive automake libtool make"
+ARG PKG_BCC="bison flex"
+
 # setup apt (add non-free, contrib and backports)
 RUN [ "$BENV_BASE_IMAGE_DISTRO" != 'debian' ] || [ "$BENV_BASE_IMAGE_VERSION" != 'sid' ] \
 || cat > /etc/apt/sources.list << EOF \
@@ -23,66 +39,29 @@ deb http://deb.debian.org/debian/ $BENV_BASE_IMAGE_VERSION-updates main non-free
 deb http://deb.debian.org/debian/ $BENV_BASE_IMAGE_VERSION-backports main non-free contrib \
 EOF
 
-RUN apt-get -y update && apt-get -y install --no-install-recommends apt-utils
-RUN apt-get upgrade -y --no-install-recommends
-
-## packages that won't install recommended dependencies
-
-# core tools
-ARG PKG_CORE="wget curl git gnupg bc aptitude netcat-openbsd"
-RUN apt-get -y install --no-install-recommends $PKG_CORE
-
-# text tools
-ARG PKG_TEXT="xxd sed ripgrep less jq"
-RUN apt-get -y install --no-install-recommends $PKG_TEXT
-
-# compilers
-ARG PKG_MAKE="g++"
-RUN apt-get -y install --no-install-recommends $PKG_MAKE
-
-# build tools
-ARG PKG_BUILD="ninja-build"
-RUN apt-get -y install --no-install-recommends $PKG_BUILD
-
-ARG PKG_LINTERS="clang-format clang-tidy shellcheck"
-RUN apt-get -y install --no-install-recommends $PKG_LINTERS
-
-# package managers
-ARG PKG_MANAGERS="pkg-config rpm"
-RUN apt-get -y install --no-install-recommends $PKG_MANAGERS
-
-# kernel tools
-ARG PKG_KERNEL="dkms build-essential"
-RUN apt-get -y install --no-install-recommends $PKG_KERNEL
-
-# dev tools
-ARG PKG_DEV="gdb cgdb tmux strace"
-RUN apt-get -y install --no-install-recommends $PKG_DEV
-
-# dev libraries
-ARG PKG_LIBS="libc-ares-dev libelf-dev libssl-dev libzstd-dev libgrpc-dev libcurl4-openssl-dev libabsl-dev protobuf-compiler-grpc"
-RUN apt-get -y install --no-install-recommends $PKG_LIBS
-
-ARG PKG_PY_TEST="python3-pytest python3-dev python3-pip python3-setuptools python3-wheel pylint3"
-RUN apt-get -y install --no-install-recommends $PKG_PY_TEST
-
-# java sdk
-ARG PKG_JAVA="default-jdk-headless"
-RUN apt-get -y install --no-install-recommends $PKG_JAVA
-
-# LLVM
-ARG PKG_LLVM="llvm-11-dev libclang-11-dev clang-11"
-RUN apt-get -y install --no-install-recommends $PKG_LLVM
-
-## packages that will install recommended dependencies
-
-# make tools
-ARG PKG_MAKE="cmake ccache autoconf autoconf-archive automake libtool make"
-RUN apt-get -y install $PKG_MAKE
-
-# bcc dependencies
-ARG PKG_BCC="bison flex"
-RUN apt-get -y install $PKG_BCC
+# Update, upgrade, and install all packages
+RUN apt-get -y update && \
+    apt-get -y install --no-install-recommends apt-utils && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get -y install --no-install-recommends \
+        $PKG_CORE \
+        $PKG_TEXT \
+        $PKG_COMPILERS \
+        $PKG_BUILD \
+        $PKG_LINTERS \
+        $PKG_MANAGERS \
+        $PKG_KERNEL \
+        $PKG_DEV \
+        $PKG_LIBS \
+        $PKG_PY_TEST \
+        $PKG_JAVA \
+        $PKG_LLVM && \
+    apt-get -y install \
+        $PKG_MAKE \
+        $PKG_BCC && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Recent version of Go
 WORKDIR /usr/local
