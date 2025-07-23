@@ -58,24 +58,11 @@ runs:
     - name: Initialize directory-specific submodules
       shell: bash
       run: |
-        # Get all submodules for the specific directory
         DIRECTORY="${{ inputs.directory }}"
         echo "Initializing submodules for directory: ${DIRECTORY}"
         
-        # Find all submodules that start with the directory path
-        SUBMODULES=$(git config --file .gitmodules --get-regexp '^submodule\..+\.path$' | \
-                    grep "^submodule\.[^.]*\.path ${DIRECTORY}/" | \
-                    cut -d' ' -f2-)
-        
-        if [ -n "$SUBMODULES" ]; then
-          echo "Found submodules for ${DIRECTORY}:"
-          echo "$SUBMODULES"
-          
-          # Use xargs to handle multiple submodules efficiently
-          echo "$SUBMODULES" | xargs -I {} git submodule update --init --recursive {}
-        else
-          echo "No submodules found for directory ${DIRECTORY}"
-        fi
+        # Initialize submodules for the specific directory path
+        git submodule update --init --recursive -- "${DIRECTORY}/"
 
     - name: Compute image tag
       id: compute-tag
