@@ -62,7 +62,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Second layer - depends on base
@@ -83,7 +82,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-bcc:
@@ -103,7 +101,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-libuv:
@@ -123,7 +120,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-cpp-misc:
@@ -143,7 +139,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-go:
@@ -163,7 +158,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-abseil-cpp:
@@ -183,7 +177,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-libmaxminddb:
@@ -203,7 +196,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   build-libbpf:
@@ -223,7 +215,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Third layer - depends on base + openssl
@@ -244,7 +235,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Fourth layer - depends on base + abseil_cpp + openssl
@@ -265,7 +255,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Fifth layer - depends on base + openssl + curl
@@ -286,7 +275,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Sixth layer - depends on base + openssl + curl + grpc_cpp
@@ -307,7 +295,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Seventh layer - depends on base + grpc_cpp
@@ -328,7 +315,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Final layer - depends on all previous layers
@@ -368,7 +354,6 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ inputs.dry_run }}
           ref: ${{ inputs.ref }}
 
   # Push final image to docker.io with proper tags

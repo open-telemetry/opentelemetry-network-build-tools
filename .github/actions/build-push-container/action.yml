@@ -22,10 +22,6 @@ inputs:
     description: 'Prefix for image names'
     required: false
     default: 'benv'
-  dry_run:
-    description: 'Build but do not push'
-    required: false
-    default: 'false'
   ref:
     description: 'Git ref to checkout'
     required: false
@@ -267,10 +263,6 @@ runs:
         
         docker build -t "${FULL_IMAGE_TAG}" ${BUILD_ARGS} "${DIRECTORY}/"
         
-        # Push if not dry run
-        if [[ "${{ inputs.dry_run }}" == "false" ]]; then
-          echo "Pushing image: ${FULL_IMAGE_TAG}"
-          docker push "${FULL_IMAGE_TAG}"
-        else
-          echo "Dry run: would push image: ${FULL_IMAGE_TAG}"
-        fi
+        # Always push intermediate builds to cache registry (dry_run only affects final Docker Hub push)
+        echo "Pushing image to cache registry: ${FULL_IMAGE_TAG}"
+        docker push "${FULL_IMAGE_TAG}"
