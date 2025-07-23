@@ -28,7 +28,7 @@ ARG PKG_PY_TEST="python3-pytest python3-dev python3-pip python3-setuptools pytho
 ARG PKG_JAVA="default-jdk-headless"
 ARG PKG_LLVM="llvm-11-dev libclang-11-dev clang-11"
 ARG PKG_MAKE="cmake ccache autoconf autoconf-archive automake libtool make"
-ARG PKG_BCC="bison flex"
+ARG PKG_BCC="bison flex zip"
 
 # setup apt (add non-free, contrib and backports)
 RUN [ "$BENV_BASE_IMAGE_DISTRO" != 'debian' ] || [ "$BENV_BASE_IMAGE_VERSION" != 'sid' ] \
