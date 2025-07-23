@@ -22,8 +22,7 @@ ARG NPROC
 WORKDIR $HOME
 COPY --chown=${UID}:${GID} lz4 lz4
 WORKDIR $HOME/lz4
-RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; \
-    make prefix=$HOME/install install
+RUN make prefix=$HOME/install install
 
 # yaml-cpp
 WORKDIR $HOME
