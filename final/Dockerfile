@@ -32,7 +32,7 @@ FROM build-main AS build-result
 ARG PKG_DOCKER="docker.io docker-compose"
 ARG PKG_KERNEL_TOOLS="kmod selinux-utils"
 ARG PKG_CORE_TOOLS="pass"
-ARG PKG_DEV_TOOLS="vim-nox lsof"
+ARG PKG_DEV_TOOLS="vim-nox lsof silversearcher-ag ssh"
 ARG PKG_AWS_TOOLS="awscli"
 ARG BENV_JAVA_VERSION=17
 ARG PKG_EXTRA_PACKAGES="openjdk-${BENV_JAVA_VERSION}-jdk-headless google-cloud-sdk google-cloud-sdk-skaffold"
