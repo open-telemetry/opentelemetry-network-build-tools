@@ -61,7 +61,6 @@ RUN apt-get -y update && \
     apt-get -y install \
         $PKG_MAKE \
         $PKG_BCC && \
-    apt remove -y libuv1 && \
     apt-get upgrade -y --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -101,6 +100,6 @@ RUN set -ex; \
     rm $HOME/test || (echo "ERROR: File removal test failed" && exit 1)
 
 # setup path in both ENV and shell profile
-ENV PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-RUN echo 'export PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' >> $HOME/.profile
+ENV PATH="$HOME/install/bin:/usr/local/go/bin:$PATH"
+RUN echo 'export PATH="$HOME/install/bin:/usr/local/go/bin:$PATH"' >> $HOME/.profile
 

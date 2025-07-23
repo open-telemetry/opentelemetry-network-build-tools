@@ -10,6 +10,7 @@ ARG NPROC
 ARG BUILD_CFLAGS
 
 WORKDIR $HOME
+RUN sudo apt remove -y libuv1
 COPY libuv libuv
 WORKDIR $HOME/libuv
 RUN ./autogen.sh
