@@ -31,6 +31,11 @@ on:
         required: false
         type: string
         default: "otel"
+      force_rebuild:
+        description: "Force rebuild all containers (ignore cache)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -63,6 +68,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Second layer - depends on base
   build-openssl:
@@ -83,6 +89,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-bcc:
     name: Build bcc image
@@ -102,6 +109,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-libuv:
     name: Build libuv image
@@ -121,6 +129,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-cpp-misc:
     name: Build cpp_misc image
@@ -140,6 +149,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-go:
     name: Build go image
@@ -159,6 +169,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-abseil-cpp:
     name: Build abseil_cpp image
@@ -178,6 +189,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-libmaxminddb:
     name: Build libmaxminddb image
@@ -197,6 +209,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   build-libbpf:
     name: Build libbpf image
@@ -216,6 +229,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Third layer - depends on base + openssl
   build-curl:
@@ -236,6 +250,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Fourth layer - depends on base + abseil_cpp + openssl
   build-grpc-cpp:
@@ -256,6 +271,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Fifth layer - depends on base + openssl + curl
   build-aws-sdk:
@@ -276,6 +292,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Sixth layer - depends on base + openssl + curl + grpc_cpp
   build-gcp-cpp:
@@ -296,6 +313,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Seventh layer - depends on base + grpc_cpp
   build-opentelemetry:
@@ -316,6 +334,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Final layer - depends on all previous layers
   build-final:
@@ -355,6 +374,7 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
+          force_rebuild: ${{ inputs.force_rebuild }}
 
   # Push final image to docker.io with proper tags
   push-to-dockerhub:

@@ -26,6 +26,10 @@ inputs:
     description: 'Git ref to checkout'
     required: false
     default: 'main'
+  force_rebuild:
+    description: 'Force rebuild and push even if image exists in registry'
+    required: false
+    default: 'false'
 
 outputs:
   image-tag:
@@ -205,7 +209,10 @@ runs:
       run: |
         FULL_IMAGE_TAG="${{ steps.compute-recursive-tags.outputs.full-image-tag }}"
         
-        if docker manifest inspect "${FULL_IMAGE_TAG}" >/dev/null 2>&1; then
+        if [[ "${{ inputs.force_rebuild }}" == "true" ]]; then
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Force rebuild enabled - will rebuild ${FULL_IMAGE_TAG} regardless of registry state"
+        elif docker manifest inspect "${FULL_IMAGE_TAG}" >/dev/null 2>&1; then
           echo "exists=true" >> $GITHUB_OUTPUT
           echo "Image ${FULL_IMAGE_TAG} already exists in registry"
         else
