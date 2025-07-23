@@ -102,5 +102,5 @@ RUN set -ex; \
 
 # setup path in both ENV and shell profile
 ENV PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-RUN echo 'export PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' >> $HOME/.bashrc
+RUN echo 'export PATH="$HOME/install/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' >> $HOME/.profile
 
