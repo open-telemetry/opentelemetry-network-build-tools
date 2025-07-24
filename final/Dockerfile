@@ -71,6 +71,18 @@ RUN sudo wget \
   https://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.12/swagger-codegen-cli-2.4.12.jar \
   -O /usr/local/lib/swagger-codegen-cli.jar
 
+# Preprocessor for BPF used by cmake
+RUN pip3 install --break-system-packages pcpp
+
+# add a script to setup build inside of container
+# to be run after we build the image.
+RUN ln -s $HOME/src/dev/benv-build.sh build.sh
+
+# Licensing information
+#
+COPY LICENSE.txt $HOME/
+COPY NOTICE.txt $HOME/
+
 # copy artifacts from individual builds
 COPY --from=build-bcc $HOME/install $HOME/install
 COPY --from=build-libuv $HOME/install $HOME/install
@@ -85,18 +97,6 @@ COPY --from=build-libbpf $HOME/install $HOME/install
 COPY --from=build-go $HOME/go/bin /usr/local/go/bin
 COPY --from=build-go $HOME/go/src /usr/local/go/src
 COPY --from=build-go $HOME/go/pkg /usr/local/go/pkg
-
-# Preprocessor for BPF used by cmake
-RUN pip3 install --break-system-packages pcpp
-
-# add a script to setup build inside of container
-# to be run after we build the image.
-RUN ln -s $HOME/src/dev/benv-build.sh build.sh
-
-# Licensing information
-#
-COPY LICENSE.txt $HOME/
-COPY NOTICE.txt $HOME/
 
 ARG BENV_UNMINIMIZE=false
 RUN (which unminimize && $BENV_UNMINIMIZE && (yes | sudo unminimize)) || true
