@@ -257,6 +257,15 @@ runs:
           BUILD_ARGS="${BUILD_ARGS} --build-arg BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}"
         fi
         
+        # Add CMAKE_BUILD_TYPE (defaults to Release if not set)
+        CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        
+        # Add BUILD_CFLAGS based on build type
+        if [ "${CMAKE_BUILD_TYPE}" = "Debug" ]; then
+          BUILD_ARGS="${BUILD_ARGS} --build-arg BUILD_CFLAGS='-O0 -g'"
+        fi
+        
         # Build the image
         echo "Building image: ${FULL_IMAGE_TAG}"
         echo "Build args: ${BUILD_ARGS}"
