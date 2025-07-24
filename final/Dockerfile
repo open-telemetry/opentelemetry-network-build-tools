@@ -48,9 +48,20 @@ RUN sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http:
         $PKG_DEV_TOOLS \
         $PKG_AWS_TOOLS \
         $PKG_EXTRA_PACKAGES \
-        $PKG_PYTHON_LIBS && \
+        $PKG_PYTHON_LIBS \
+        libcap2-bin && \
+    # START fix podman permissions -- see comment below \
+    sudo chmod 0755 /usr/bin/newuidmap /usr/bin/newgidmap && \
+    sudo setcap cap_setuid=ep /usr/bin/newuidmap && \
+    sudo setcap cap_setgid=ep /usr/bin/newgidmap && \
+    sudo apt-get autoremove --purge -y libcap2-bin && \
+    # END fix podman permissions \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
+
+# For info on the fix to podman in container, see https://samuel.forestier.app/blog/security/podman-rootless-in-podman-rootless-the-debian-way
+# Replace setuid bits by proper file capabilities for uidmap binaries.
+# See <https://github.com/containers/podman/discussions/19931>.
 
 ## java version required by render framework parser
 RUN case $(uname -m) in \
@@ -62,6 +73,7 @@ RUN case $(uname -m) in \
               ;; \
     esac
 
+RUN apt-get install -y  && \
 
 # gradle
 RUN sudo wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -O /usr/local/lib/gradle.zip
