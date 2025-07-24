@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ARG BENV_BASE_IMAGE_DISTRO=debian
-ARG BENV_BASE_IMAGE_VERSION=bullseye@sha256:25c0cab214b810db1b3c8adef5a12a92596979abddf86bb364e8d9c9d111df9f
+ARG BENV_BASE_IMAGE_VERSION=bookworm@sha256:b6507e340c43553136f5078284c8c68d86ec8262b1724dde73c325e8d3dcdeba
 FROM ${BENV_BASE_IMAGE_DISTRO}:${BENV_BASE_IMAGE_VERSION} AS build-main
 
 ################ DEPENDENCIES ################
@@ -24,9 +24,9 @@ ARG PKG_MANAGERS="pkg-config rpm"
 ARG PKG_KERNEL="dkms build-essential"
 ARG PKG_DEV="gdb cgdb tmux strace"
 ARG PKG_LIBS="libc-ares-dev libelf-dev libssl-dev libzstd-dev libgrpc-dev libcurl4-openssl-dev libabsl-dev protobuf-compiler-grpc libcurlpp-dev libgrpc++-dev libprotobuf-dev"
-ARG PKG_PY_TEST="python3-pytest python3-dev python3-pip python3-setuptools python3-wheel pylint3"
+ARG PKG_PY_TEST="python3-pytest python3-dev python3-pip python3-setuptools python3-wheel pylint"
 ARG PKG_JAVA="default-jdk-headless"
-ARG PKG_LLVM="llvm-11-dev libclang-11-dev clang-11"
+ARG PKG_LLVM="llvm-16-dev libclang-16-dev clang-16"
 ARG PKG_MAKE="cmake ccache autoconf autoconf-archive automake libtool make"
 ARG PKG_BCC="bison flex zip"
 ARG PKG_LIBBPF="zip pkg-config libelf-dev zlib1g-dev libbfd-dev libcap-dev"
