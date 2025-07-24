@@ -73,8 +73,6 @@ RUN case $(uname -m) in \
               ;; \
     esac
 
-RUN apt-get install -y  && \
-
 # gradle
 RUN sudo wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -O /usr/local/lib/gradle.zip
 
