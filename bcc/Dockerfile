@@ -10,7 +10,12 @@ ARG CMAKE_BUILD_TYPE
 ARG RESTRICTED_NPROC
 
 WORKDIR $HOME
-COPY --chown=${UID}:${GID} bcc bcc
+
+RUN git clone --depth 1 https://github.com/iovisor/bcc.git && \
+    cd bcc && \
+    git fetch --unshallow && \
+    git checkout 6acb86effa7a6e8029b68eccb805dd1ee60ecc5a
+
 WORKDIR $HOME/build/bcc
 
 RUN echo $PATH
