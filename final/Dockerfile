@@ -87,7 +87,7 @@ COPY --from=build-go $HOME/go/src /usr/local/go/src
 COPY --from=build-go $HOME/go/pkg /usr/local/go/pkg
 
 # Preprocessor for BPF used by cmake
-RUN pip3 install pcpp
+RUN pip3 install --break-system-packages pcpp
 
 # add a script to setup build inside of container
 # to be run after we build the image.
