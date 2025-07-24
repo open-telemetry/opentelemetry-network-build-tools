@@ -29,7 +29,7 @@ FROM $libbpf_IMAGE_TAG as build-libbpf
 FROM build-main AS build-result
 
 # Package definitions
-ARG PKG_DOCKER="podman"
+ARG PKG_DOCKER="podman uidmap"
 ARG PKG_KERNEL_TOOLS="kmod selinux-utils"
 ARG PKG_CORE_TOOLS="pass"
 ARG PKG_DEV_TOOLS="vim-nox lsof silversearcher-ag ssh"
