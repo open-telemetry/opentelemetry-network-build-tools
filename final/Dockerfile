@@ -47,8 +47,8 @@ RUN sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http:
         $PKG_CORE_TOOLS \
         $PKG_DEV_TOOLS \
         $PKG_AWS_TOOLS \
-        $PKG_EXTRA_PACKAGES && \
-        ${PKG_PYTHON_LIBS} && \
+        $PKG_EXTRA_PACKAGES \
+        $PKG_PYTHON_LIBS && \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
