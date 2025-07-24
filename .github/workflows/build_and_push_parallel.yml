@@ -5,6 +5,12 @@ name: build-and-push-parallel
 run-name: Create a build-env container and push to docker hub
 
 on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ref:
@@ -44,10 +50,13 @@ permissions:
 env:
   CACHE_REGISTRY: ghcr.io
   FINAL_REGISTRY: docker.io
-  IMAGE_PREFIX: ${{ inputs.image_prefix }}
+  IMAGE_PREFIX: ${{ inputs.image_prefix || 'opentelemetry-network-' }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  DOCKER_NAMESPACE: ${{ inputs.registry_workspace }}
+  DOCKER_NAMESPACE: ${{ inputs.registry_workspace || 'otel' }}
+  DRY_RUN: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run }}
+  REF: ${{ inputs.ref || github.ref }}
+  FORCE_REBUILD: ${{ inputs.force_rebuild || false }}
 
 jobs:
   build-base:
@@ -57,7 +66,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push base image
         uses: ./.github/actions/build-push-container//
@@ -66,8 +75,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-bcc:
     name: Build bcc image
@@ -77,7 +86,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push bcc image
         uses: ./.github/actions/build-push-container/
@@ -86,8 +95,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-libuv:
     name: Build libuv image
@@ -97,7 +106,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push libuv image
         uses: ./.github/actions/build-push-container/
@@ -106,8 +115,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-cpp-misc:
     name: Build cpp_misc image
@@ -117,7 +126,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push cpp_misc image
         uses: ./.github/actions/build-push-container/
@@ -126,8 +135,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-go:
     name: Build go image
@@ -137,7 +146,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push go image
         uses: ./.github/actions/build-push-container/
@@ -146,8 +155,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-libmaxminddb:
     name: Build libmaxminddb image
@@ -157,7 +166,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push libmaxminddb image
         uses: ./.github/actions/build-push-container/
@@ -166,8 +175,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-libbpf:
     name: Build libbpf image
@@ -177,7 +186,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push libbpf image
         uses: ./.github/actions/build-push-container/
@@ -186,8 +195,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-aws-sdk:
     name: Build aws_sdk image
@@ -197,7 +206,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push aws_sdk image
         uses: ./.github/actions/build-push-container/
@@ -206,8 +215,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-gcp-cpp:
     name: Build gcp_cpp image
@@ -217,7 +226,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push gcp_cpp image
         uses: ./.github/actions/build-push-container/
@@ -226,8 +235,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-opentelemetry:
     name: Build opentelemetry image
@@ -237,7 +246,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push opentelemetry image
         uses: ./.github/actions/build-push-container/
@@ -246,8 +255,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   build-final:
     name: Build final image
@@ -271,7 +280,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
 
       - name: Build and push final image to cache registry
         id: build
@@ -281,8 +290,8 @@ jobs:
           registry: ${{ env.CACHE_REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
-          force_rebuild: ${{ inputs.force_rebuild }}
+          ref: ${{ env.REF }}
+          force_rebuild: ${{ env.FORCE_REBUILD }}
 
   # Push final image to docker.io with proper tags
   push-to-dockerhub:
@@ -293,7 +302,7 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.REF }}
           fetch-depth: 0
 
       - name: Log in to GitHub Container Registry
@@ -332,14 +341,14 @@ jobs:
           fi
           
           # Set up image name and path for Docker Hub
-          image_name="${{ inputs.image_prefix }}build-tools"
+          image_name="${{ env.IMAGE_PREFIX }}build-tools"
           docker_registry=$(sed -e 's,^https://,,' -e 's,/*$,,' <<< ${{ env.FINAL_REGISTRY }})
           image_path="${docker_registry}/${{ env.DOCKER_NAMESPACE }}/${image_name}"
           
           # Tag and push to Docker Hub
           for tag in ${tags[@]}; do
             docker tag "${CACHE_IMAGE}" "${image_path}:${tag}"
-            if [[ "${{ inputs.dry_run }}" == "false" ]]; then
+            if [[ "${{ env.DRY_RUN }}" == "false" ]]; then
               docker push "${image_path}:${tag}"
               echo "Pushed ${image_path}:${tag}"
             else
