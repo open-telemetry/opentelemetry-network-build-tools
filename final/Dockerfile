@@ -36,6 +36,7 @@ ARG PKG_DEV_TOOLS="vim-nox lsof silversearcher-ag ssh"
 ARG PKG_AWS_TOOLS="awscli"
 ARG BENV_JAVA_VERSION=17
 ARG PKG_EXTRA_PACKAGES="openjdk-${BENV_JAVA_VERSION}-jdk-headless google-cloud-sdk google-cloud-sdk-skaffold"
+ARG PKG_PYTHON_LIBS="python3-ijson python3-docker"
 
 RUN sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list' && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
@@ -47,11 +48,9 @@ RUN sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http:
         $PKG_DEV_TOOLS \
         $PKG_AWS_TOOLS \
         $PKG_EXTRA_PACKAGES && \
+        ${PKG_PYTHON_LIBS} && \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
-
-ARG PKG_PYTHON_LIBS="ijson docker"
-RUN pip3 install $PKG_PYTHON_LIBS
 
 ## java version required by render framework parser
 RUN case $(uname -m) in \
