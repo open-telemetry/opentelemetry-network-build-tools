@@ -4,14 +4,8 @@
 # gcp_cpp
 
 ARG base_IMAGE_TAG
-ARG openssl_IMAGE_TAG
-ARG curl_IMAGE_TAG
-ARG grpc_cpp_IMAGE_TAG
 
-FROM $openssl_IMAGE_TAG as benv-openssl
-FROM $curl_IMAGE_TAG as benv-curl
-FROM $grpc_cpp_IMAGE_TAG as benv-grpc_cpp
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 ARG NPROC
 ARG CMAKE_BUILD_TYPE
@@ -21,19 +15,15 @@ ARG CMAKE_BUILD_TYPE
 ##############
 
 WORKDIR $HOME
-COPY googleapis googleapis
+COPY --chown=${UID}:${GID} googleapis googleapis
 
 ###########################
 # google-cloud-cpp-common #
 ###########################
 
 WORKDIR $HOME
-COPY google-cloud-cpp-common google-cloud-cpp-common
+COPY --chown=${UID}:${GID} google-cloud-cpp-common google-cloud-cpp-common
 WORKDIR $HOME/build/google-cloud-cpp-common
-
-COPY --from=benv-openssl $HOME/install/openssl $HOME/openssl
-COPY --from=benv-curl $HOME/install $HOME/curl
-COPY --from=benv-grpc_cpp $HOME/install $HOME/grpc_cpp
 
 RUN nice cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install \
@@ -50,12 +40,8 @@ RUN nice make -j${NPROC:-3} install
 ####################
 
 WORKDIR $HOME
-COPY google-cloud-cpp google-cloud-cpp
+COPY --chown=${UID}:${GID} google-cloud-cpp google-cloud-cpp
 WORKDIR $HOME/build/google-cloud-cpp
-
-COPY --from=benv-openssl $HOME/install/openssl $HOME/openssl
-COPY --from=benv-curl $HOME/install $HOME/curl
-COPY --from=benv-grpc_cpp $HOME/install $HOME/grpc_cpp
 
 RUN nice cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install \
@@ -69,3 +55,7 @@ RUN nice cmake \
 	$HOME/google-cloud-cpp
 RUN nice make -j${NPROC:-3}
 #RUN nice make -j${NPROC:-3} install
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/install $HOME/install

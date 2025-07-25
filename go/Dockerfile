@@ -4,7 +4,7 @@
 # Golang: grpc, grpc-gateway
 
 ARG base_IMAGE_TAG
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 # protoc-gen-go
 RUN /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
@@ -22,3 +22,9 @@ RUN mkdir -p $HOME/go/src/github.com/grpc-ecosystem && \
 
 # staticheck linter
 RUN /usr/local/go/bin/go install honnef.co/go/tools/cmd/staticcheck@2023.1
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/go/bin $HOME/go/bin
+COPY --from=build $HOME/go/src $HOME/go/src
+COPY --from=build $HOME/go/pkg $HOME/go/pkg

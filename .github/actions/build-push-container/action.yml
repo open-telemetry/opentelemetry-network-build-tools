@@ -54,15 +54,6 @@ runs:
         ref: ${{ inputs.ref }}
         fetch-depth: 0
 
-    - name: Initialize directory-specific submodules
-      shell: bash
-      run: |
-        DIRECTORY="${{ inputs.directory }}"
-        echo "Initializing submodules for directory: ${DIRECTORY}"
-        
-        # Initialize submodules for the specific directory path
-        git submodule update --init --recursive -- "${DIRECTORY}/"
-
     - name: Compute recursive tags for all directories
       id: compute-recursive-tags
       shell: bash
@@ -74,24 +65,20 @@ runs:
         # Define dependency mapping based on CMakeLists.txt
         declare -A DEPS
         DEPS["base"]=""
-        DEPS["openssl"]="base"
         DEPS["bcc"]="base"
         DEPS["libuv"]="base"
         DEPS["cpp_misc"]="base"
         DEPS["go"]="base"
-        DEPS["abseil_cpp"]="base"
         DEPS["libmaxminddb"]="base"
         DEPS["libbpf"]="base"
-        DEPS["curl"]="base openssl"
-        DEPS["grpc_cpp"]="base abseil_cpp openssl"
-        DEPS["aws_sdk"]="base openssl curl"
-        DEPS["gcp_cpp"]="base openssl curl grpc_cpp"
-        DEPS["opentelemetry"]="base grpc_cpp"
-        DEPS["final"]="base openssl curl bcc libuv aws_sdk cpp_misc go grpc_cpp abseil_cpp libmaxminddb gcp_cpp opentelemetry libbpf"
+        DEPS["aws_sdk"]="base"
+        DEPS["gcp_cpp"]="base"
+        DEPS["opentelemetry"]="base"
+        DEPS["final"]="base bcc libuv aws_sdk cpp_misc go libmaxminddb gcp_cpp opentelemetry libbpf"
         
         # Compute direct hashes for all directories upfront
         declare -A DIRECT_HASHES
-        ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
+        ALL_DIRS="base bcc libuv cpp_misc go libmaxminddb libbpf aws_sdk gcp_cpp opentelemetry final"
         
         echo "Computing direct hashes..." >&2
         for dir in $ALL_DIRS; do
@@ -187,7 +174,6 @@ runs:
         
         # Compute all dependency tags for build args
         echo "Computing all dependency tags..." >&2
-        ALL_DIRS="base openssl bcc libuv cpp_misc go abseil_cpp libmaxminddb libbpf curl grpc_cpp aws_sdk gcp_cpp opentelemetry final"
         
         for dir in $ALL_DIRS; do
           if [[ "$dir" != "$DIRECTORY" ]]; then
@@ -220,6 +206,17 @@ runs:
           echo "Image ${FULL_IMAGE_TAG} does not exist in registry"
         fi
 
+    - name: Initialize directory submodules
+      if: steps.check-exists.outputs.exists == 'false'
+      shell: bash
+      run: |
+        DIRECTORY="${{ inputs.directory }}"
+        echo "Initializing submodules for directory: ${DIRECTORY}"
+        
+        # Initialize submodules for the specific directory path
+        git submodule update --init --recursive -- "${DIRECTORY}/"
+
+
     - name: Log in to Container Registry
       if: steps.check-exists.outputs.exists == 'false'
       uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
@@ -240,16 +237,12 @@ runs:
         
         # Add all dependency image tags as build args using outputs from compute-recursive-tags step
         BUILD_ARGS="${BUILD_ARGS} --build-arg base_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.base_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg openssl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.openssl_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg bcc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.bcc_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libuv_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libuv_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg cpp_misc_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.cpp_misc_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg go_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.go_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg abseil_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.abseil_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libmaxminddb_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libmaxminddb_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg libbpf_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.libbpf_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg curl_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.curl_IMAGE_TAG }}"
-        BUILD_ARGS="${BUILD_ARGS} --build-arg grpc_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.grpc_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg aws_sdk_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.aws_sdk_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg gcp_cpp_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.gcp_cpp_IMAGE_TAG }}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg opentelemetry_IMAGE_TAG=${{ steps.compute-recursive-tags.outputs.opentelemetry_IMAGE_TAG }}"
@@ -262,6 +255,15 @@ runs:
         
         if [ -n "${BENV_BASE_IMAGE_VERSION}" ]; then
           BUILD_ARGS="${BUILD_ARGS} --build-arg BENV_BASE_IMAGE_VERSION=${BENV_BASE_IMAGE_VERSION}"
+        fi
+        
+        # Add CMAKE_BUILD_TYPE (defaults to Release if not set)
+        CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}"
+        BUILD_ARGS="${BUILD_ARGS} --build-arg CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        
+        # Add BUILD_CFLAGS based on build type
+        if [ "${CMAKE_BUILD_TYPE}" = "Debug" ]; then
+          BUILD_ARGS="${BUILD_ARGS} --build-arg BUILD_CFLAGS='-O0 -g'"
         fi
         
         # Build the image

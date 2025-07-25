@@ -12,7 +12,7 @@
 # - googletest
 
 ARG base_IMAGE_TAG
-FROM $base_IMAGE_TAG
+FROM $base_IMAGE_TAG AS build
 
 ARG CMAKE_BUILD_TYPE
 ARG BUILD_CFLAGS
@@ -20,13 +20,13 @@ ARG NPROC
 
 # LZ4
 WORKDIR $HOME
-COPY lz4 lz4
+COPY --chown=${UID}:${GID} lz4 lz4
 WORKDIR $HOME/lz4
-RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; make prefix=$HOME/install install
+RUN make prefix=$HOME/install install
 
 # yaml-cpp
 WORKDIR $HOME
-COPY yaml-cpp yaml-cpp
+COPY --chown=${UID}:${GID} yaml-cpp yaml-cpp
 WORKDIR $HOME/build/yaml-cpp
 RUN cmake \
     -G Ninja \
@@ -49,13 +49,13 @@ RUN CFLAGS=`echo ${BUILD_CFLAGS} | sed 's/\\\\ / /g'`; nice make -j${NPROC:-3} &
 
 # args
 WORKDIR $HOME
-COPY args args
+COPY --chown=${UID}:${GID} args args
 WORKDIR $HOME/args
 RUN make DESTDIR=$HOME/install install
 
 # nlohmann_json
 WORKDIR $HOME
-COPY json json
+COPY --chown=${UID}:${GID} json json
 WORKDIR $HOME/json
 RUN cmake \
   "-DCMAKE_INSTALL_PREFIX=$HOME/install" \
@@ -66,7 +66,7 @@ RUN nice cmake --build . --target install -j ${NPROC:-3} --config $CMAKE_BUILD_T
 
 # spdlog
 WORKDIR $HOME
-COPY spdlog spdlog
+COPY --chown=${UID}:${GID} spdlog spdlog
 WORKDIR $HOME/spdlog
 RUN cmake \
   "-DCMAKE_INSTALL_PREFIX=$HOME/install" \
@@ -79,12 +79,12 @@ RUN nice cmake --build . --target install -j ${NPROC:-3} --config $CMAKE_BUILD_T
 
 # ccan
 WORKDIR $HOME
-COPY ccan ccan
+COPY --chown=${UID}:${GID} ccan ccan
 RUN tar -cf- ccan/**/*.h | tar -xvf- -C $HOME/install/include
 
 # googletest
 WORKDIR $HOME
-COPY googletest googletest
+COPY --chown=${UID}:${GID} googletest googletest
 WORKDIR $HOME/googletest
 RUN cmake \
   "-DCMAKE_INSTALL_PREFIX=$HOME/install" \
@@ -96,3 +96,7 @@ RUN nice cmake --build . -j ${NPROC:-3} --config $CMAKE_BUILD_TYPE
 RUN cp lib/*.a $HOME/install/lib
 RUN cp -R googletest/include/gtest $HOME/install/include
 RUN cp -R googlemock/include/gmock $HOME/install/include
+
+# Runtime stage - copy only necessary artifacts
+FROM $base_IMAGE_TAG
+COPY --from=build $HOME/install $HOME/install
